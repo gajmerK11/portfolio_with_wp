@@ -1,0 +1,157 @@
+<?php
+/**
+ * Front Page render callbacks.
+ *
+ * Shared by the template (template-parts/sections/home.php) and by the
+ * Customizer selective-refresh partials, so preview + front match exactly.
+ *
+ * @package Portfolio
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Sanitize greeting/subtitle copy: allow only <span class> and <br>.
+ *
+ * Lets the user colour words (span.text-primary) and break lines (br)
+ * from the Customizer without opening up arbitrary HTML.
+ *
+ * @param string $value Raw value.
+ * @return string
+ */
+function portfolio_kses_greeting( $value ) {
+	return wp_kses(
+		$value,
+		array(
+			'span' => array( 'class' => array() ),
+			'br'   => array(),
+		)
+	);
+}
+
+/**
+ * Default greeting-card copy.
+ *
+ * row1 = line 01. row2 = lines 02 + 03 (split on <br>).
+ *
+ * @return array
+ */
+function portfolio_fp_greeting_defaults() {
+	return array(
+		'row1'     => '<span class="text-neutral">&lt;</span> Hi, I\'m <span class="text-primary">Brice</span> ! <span class="text-neutral">&gt;</span>',
+		'row2'     => '<span class="text-neutral">&lt;</span> I <span class="text-primary">design</span> and <span class="text-primary">develop</span> <br> <span class="text-primary">web sites</span> . <span class="text-neutral">&gt;</span>',
+		'subtitle' => 'I also design your branding, logo...',
+	);
+}
+
+/**
+ * Default floating tech icons: url, position, size, label.
+ *
+ * @return array Keyed 1..8.
+ */
+function portfolio_fp_icon_defaults() {
+	return array(
+		1 => array( 'url' => 'https://cdn.simpleicons.org/php',        'pos' => 'top:13%;left:39%;', 'size' => 'w-20 h-20', 'label' => 'PHP' ),
+		2 => array( 'url' => 'https://cdn.simpleicons.org/react',      'pos' => 'top:18%;left:62%;', 'size' => 'w-16 h-16', 'label' => 'React' ),
+		3 => array( 'url' => 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg', 'pos' => 'top:29%;left:76%;', 'size' => 'w-14 h-14', 'label' => 'Node.js' ),
+		4 => array( 'url' => 'https://cdn.simpleicons.org/html5',      'pos' => 'top:39%;left:16%;', 'size' => 'w-16 h-16', 'label' => 'HTML5' ),
+		5 => array( 'url' => 'https://cdn.simpleicons.org/css',        'pos' => 'top:57%;left:86%;', 'size' => 'w-14 h-14', 'label' => 'CSS' ),
+		6 => array( 'url' => 'https://cdn.simpleicons.org/javascript', 'pos' => 'top:73%;left:17%;', 'size' => 'w-16 h-16', 'label' => 'JavaScript' ),
+		7 => array( 'url' => 'https://cdn.simpleicons.org/wordpress',  'pos' => 'top:78%;left:45%;', 'size' => 'w-16 h-16', 'label' => 'WordPress' ),
+		8 => array( 'url' => 'https://cdn.simpleicons.org/python',     'pos' => 'top:78%;left:75%;', 'size' => 'w-16 h-16', 'label' => 'Python' ),
+	);
+}
+
+/**
+ * Resolve a floating icon URL: theme mod or default.
+ *
+ * @param int $i Icon index (1..8).
+ * @return string
+ */
+function portfolio_fp_icon_url( $i ) {
+	$defaults = portfolio_fp_icon_defaults();
+	$default  = isset( $defaults[ $i ] ) ? $defaults[ $i ]['url'] : '';
+	// An empty saved value means "use the built-in default icon".
+	$value = get_theme_mod( 'portfolio_fp_icon_' . $i, '' );
+	return ( '' !== $value ) ? $value : $default;
+}
+
+/**
+ * Render the greeting card copy block.
+ *
+ * Line numbers (01, 02, 03…) are generated automatically: row1 is line 01,
+ * and row2 adds one numbered line per <br>-separated segment.
+ *
+ * @return string
+ */
+function portfolio_render_fp_greeting() {
+	$d    = portfolio_fp_greeting_defaults();
+	$row1 = get_theme_mod( 'portfolio_fp_row1', $d['row1'] );
+	$row2 = get_theme_mod( 'portfolio_fp_row2', $d['row2'] );
+
+	// Build the visual lines.
+	$lines = array();
+	if ( trim( wp_strip_all_tags( $row1 ) ) !== '' || trim( $row1 ) !== '' ) {
+		$lines[] = trim( $row1 );
+	}
+	foreach ( preg_split( '/<br\s*\/?>/i', $row2 ) as $part ) {
+		if ( trim( $part ) !== '' ) {
+			$lines[] = trim( $part );
+		}
+	}
+
+	$total = count( $lines );
+
+	ob_start();
+	?>
+	<div id="fp-greeting" class="font-mono text-xl sm:text-2xl leading-relaxed text-gray-800">
+		<?php
+		foreach ( $lines as $idx => $line ) :
+			// Indent continuation lines (03 onward) so they align under the
+			// text of line 02 rather than under its opening bracket.
+			$indent = ( $idx >= 2 ) ? ' ml-6' : '';
+			?>
+			<div class="flex items-center gap-5<?php echo ( $idx < $total - 1 ) ? ' mb-3' : ''; ?>">
+				<span class="text-neutral text-base"><?php echo esc_html( str_pad( $idx + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
+				<div class="type-line font-bold<?php echo esc_attr( $indent ); ?>"><?php echo portfolio_kses_greeting( $line ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses-sanitized. ?></div>
+			</div>
+		<?php endforeach; ?>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+
+/**
+ * Render the subtitle under the card.
+ *
+ * @return string
+ */
+function portfolio_render_fp_subtitle() {
+	$d        = portfolio_fp_greeting_defaults();
+	$subtitle = get_theme_mod( 'portfolio_fp_subtitle', $d['subtitle'] );
+	return '<p id="fp-subtitle" class="font-mono text-base sm:text-lg text-gray-800 mt-6 pl-2">' . portfolio_kses_greeting( $subtitle ) . '</p>';
+}
+
+/**
+ * Render the floating tech icons layer.
+ *
+ * Icons render greyscale + faded and reveal their original colour on
+ * hover — see .floating-icon in src/input.css. pointer-events are enabled
+ * on the icon only, so the gaps between icons stay click-through.
+ *
+ * @return string
+ */
+function portfolio_render_fp_icons() {
+	$icons = portfolio_fp_icon_defaults();
+	ob_start();
+	?>
+	<div id="fp-floating-icons" class="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+		<?php foreach ( $icons as $i => $icon ) : ?>
+			<div class="floating-icon <?php echo esc_attr( $icon['size'] ); ?>" style="<?php echo esc_attr( $icon['pos'] ); ?>transform:translate(-50%,-50%);">
+				<img alt="" src="<?php echo esc_url( portfolio_fp_icon_url( $i ) ); ?>" style="animation-delay:<?php echo esc_attr( number_format( ( $i - 1 ) * 0.8, 1 ) ); ?>s;" loading="lazy">
+			</div>
+		<?php endforeach; ?>
+	</div>
+	<?php
+	return ob_get_clean();
+}

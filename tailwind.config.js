@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./**/*.php", "./assets/js/**/*.js", "./template-parts/**/*.php"],
+  // Classes users may type into Customizer fields (stored in DB, not scanned).
+  safelist: ["text-primary", "text-neutral"],
   theme: {
     extend: {
       colors: {

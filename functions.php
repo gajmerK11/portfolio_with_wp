@@ -11,8 +11,9 @@
 defined( 'ABSPATH' ) || exit;
 
 $portfolio_includes = array(
-	'/inc/setup.php',    // Theme supports, menus, basic registration.
-	'/inc/enqueue.php',  // Styles and scripts.
+	'/inc/setup.php',                  // Theme supports, menus, basic registration.
+	'/inc/enqueue.php',                // Styles and scripts.
+	'/inc/customizer/customizer.php',  // Customizer sections and render callbacks.
 );
 
 foreach ( $portfolio_includes as $portfolio_include ) {

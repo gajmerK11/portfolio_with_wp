@@ -12,6 +12,17 @@ defined( 'ABSPATH' ) || exit;
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script>
+	/* Gate the greeting typing intro before paint: play on every load,
+	   never when reduced motion is requested. */
+	(function () {
+		try {
+			if ( ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+				document.documentElement.classList.add( 'pre-typing' );
+			}
+		} catch ( e ) {}
+	})();
+	</script>
 	<?php wp_head(); ?>
 </head>
 

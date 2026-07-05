@@ -20,22 +20,108 @@
    Reusable component classes
 --------------------------------------------------------------- */
 @layer components {
-  /* Floating background tech icon on the home section. */
+  /* Floating background tech icon on the home section.
+     Greyscale + slightly dimmed by default (keeps light logos like JS/React
+     from washing out), original colour on hover. Each icon slowly revolves;
+     per-icon animation-delay is set inline so they drift out of sync.
+     pointer-events re-enabled on the icon only, so the gaps between
+     icons stay click-through. */
   .floating-icon {
-    @apply absolute pointer-events-none opacity-40 grayscale;
+    @apply absolute pointer-events-auto;
   }
   .floating-icon img {
-    @apply w-full h-full object-contain transition-all duration-300;
+    @apply block w-full h-full object-contain grayscale brightness-75 opacity-100 transition duration-300;
+    animation: icon-revolve 9s ease-in-out infinite;
   }
   .floating-icon:hover img {
-    @apply grayscale-0 opacity-100;
+    @apply grayscale-0 brightness-100;
   }
 
-  /* Sidebar nav item. Active state toggled by JS on scroll. */
+  /* Sidebar nav item. Active state toggled by JS on scroll.
+     Icon sits outside the label; on active the icon turns primary
+     and the label gets a bordered white pill. */
   .nav-item {
-    @apply flex items-center gap-4 px-8 py-2.5 rounded-full w-fit justify-center transition-colors text-gray-800 hover:text-primary;
+    @apply flex items-center gap-3 text-gray-800 transition-colors hover:text-primary;
+  }
+  .nav-item .nav-icon {
+    @apply w-6 h-6 shrink-0 transition-colors;
+  }
+  .nav-item .nav-label {
+    @apply px-5 py-1.5 rounded-full border border-transparent transition-all;
   }
   .nav-item.is-active {
-    @apply text-primary bg-primary/10;
+    @apply text-primary;
+  }
+  .nav-item.is-active .nav-label {
+    @apply bg-white border-gray-200 shadow-sm;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Floating icon — subtle revolving drift
+--------------------------------------------------------------- */
+@keyframes icon-revolve {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(5px, -6px) rotate(3deg);
+  }
+  50% {
+    transform: translate(0, -9px) rotate(0deg);
+  }
+  75% {
+    transform: translate(-5px, -6px) rotate(-3deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-icon img {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Greeting typing intro
+--------------------------------------------------------------- */
+/* Hide the greeting rows before the JS types them (set on <html> in
+   the head, only on the first load of a session). */
+.pre-typing #fp-greeting > div {
+  opacity: 0;
+}
+/* Solid caret while a line is typing; blinking caret once finished. */
+.type-line.is-typing {
+  border-right: 2px solid;
+}
+.type-line.is-cursor {
+  border-right: 2px solid;
+  animation: caret-blink 0.9s steps(1, end) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Read more — bobbing arrow
+--------------------------------------------------------------- */
+.read-more-arrow {
+  animation: bob 1.3s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .read-more-arrow {
+    animation: none;
   }
 }
