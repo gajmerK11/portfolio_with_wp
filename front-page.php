@@ -13,8 +13,8 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 
 get_template_part( 'template-parts/sections/home' );
-// Projects and About sections will be loaded here as they are built.
-// get_template_part( 'template-parts/sections/projects' );
+get_template_part( 'template-parts/sections/projects' );
+// About section will be loaded here as it is built.
 // get_template_part( 'template-parts/sections/about' );
 
 get_footer();

@@ -11,8 +11,10 @@
   "use strict";
 
   function init() {
-    // Runs without GSAP so the intro still plays if the CDN fails.
+    // Run without GSAP so these still work if the CDN fails.
     setupTypingIntro();
+    setupProjectsScroll();
+    setupProjectCarousels();
 
     if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
       return;
@@ -166,6 +168,67 @@
           }
         },
       });
+    });
+  }
+
+  /**
+   * Scroll the projects track one card forward on the arrow button,
+   * wrapping back to the start once the end is reached.
+   */
+  function setupProjectsScroll() {
+    var track = document.getElementById("projects-track");
+    var next = document.getElementById("projects-next");
+    if (!track || !next) {
+      return;
+    }
+
+    next.addEventListener("click", function () {
+      var card = track.querySelector(".project-card");
+      var step = card
+        ? card.getBoundingClientRect().width + 24 // + gap-6
+        : track.clientWidth * 0.8;
+      var maxLeft = track.scrollWidth - track.clientWidth - 4;
+
+      if (track.scrollLeft >= maxLeft) {
+        track.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        track.scrollBy({ left: step, behavior: "smooth" });
+      }
+    });
+  }
+
+  /**
+   * Auto-advance each project card's image carousel by sliding the track
+   * horizontally, ping-ponging through the slides (0 → last → 0) so the motion
+   * reads left→right then right→left. Cards with a single slide stay static.
+   */
+  function setupProjectCarousels() {
+    var carousels = document.querySelectorAll(".project-carousel");
+    if (!carousels.length) {
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    carousels.forEach(function (car) {
+      var track = car.querySelector(".pc-track");
+      var slides = car.querySelectorAll(".pc-slide");
+      if (!track || slides.length < 2) {
+        return;
+      }
+      var i = 0;
+      var dir = 1;
+
+      setInterval(function () {
+        i += dir;
+        if (i >= slides.length - 1) {
+          dir = -1;
+        } else if (i <= 0) {
+          dir = 1;
+        }
+        track.style.transform = "translateX(" + -i * 100 + "%)";
+      }, 3200);
     });
   }
 

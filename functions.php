@@ -11,9 +11,11 @@
 defined( 'ABSPATH' ) || exit;
 
 $portfolio_includes = array(
-	'/inc/setup.php',                  // Theme supports, menus, basic registration.
-	'/inc/enqueue.php',                // Styles and scripts.
-	'/inc/customizer/customizer.php',  // Customizer sections and render callbacks.
+	'/inc/setup.php',                              // Theme supports, menus, basic registration.
+	'/inc/enqueue.php',                            // Styles and scripts.
+	'/inc/customizer/customizer.php',              // Customizer sections and render callbacks.
+	'/inc/cpts/project-cpt.php',                   // Projects custom post type.
+	'/inc/meta-boxes/class-project-meta-box.php',  // Project details meta box.
 );
 
 foreach ( $portfolio_includes as $portfolio_include ) {
