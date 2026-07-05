@@ -15,6 +15,7 @@
     setupTypingIntro();
     setupProjectsScroll();
     setupProjectCarousels();
+    setupNavClicks();
 
     if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
       return;
@@ -141,6 +142,29 @@
   }
 
   /**
+   * Light the clicked nav item immediately and smooth-scroll to its section.
+   * Runs without GSAP so the selected state always responds to clicks.
+   */
+  function setupNavClicks() {
+    var navItems = document.querySelectorAll(".nav-item[data-target]");
+    if (!navItems.length) {
+      return;
+    }
+    navItems.forEach(function (item) {
+      item.addEventListener("click", function (e) {
+        var section = document.getElementById(item.dataset.target);
+        navItems.forEach(function (n) {
+          n.classList.toggle("is-active", n === item);
+        });
+        if (section) {
+          e.preventDefault();
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+  }
+
+  /**
    * Toggle the active nav item based on which section holds the
    * viewport center. Works for any number of [data-section] blocks.
    */
@@ -172,28 +196,39 @@
   }
 
   /**
-   * Scroll the projects track one card forward on the arrow button,
-   * wrapping back to the start once the end is reached.
+   * Each project row is its own carousel. The row's > arrow slides that row one
+   * viewport forward (wrapping at the end), and is only shown when the row
+   * actually overflows (i.e. its 4 cards don't all fit on screen).
    */
   function setupProjectsScroll() {
-    var track = document.getElementById("projects-track");
-    var next = document.getElementById("projects-next");
-    if (!track || !next) {
+    var rows = document.querySelectorAll(".project-row");
+    if (!rows.length) {
       return;
     }
 
-    next.addEventListener("click", function () {
-      var card = track.querySelector(".project-card");
-      var step = card
-        ? card.getBoundingClientRect().width + 24 // + gap-6
-        : track.clientWidth * 0.8;
-      var maxLeft = track.scrollWidth - track.clientWidth - 4;
-
-      if (track.scrollLeft >= maxLeft) {
-        track.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        track.scrollBy({ left: step, behavior: "smooth" });
+    rows.forEach(function (row) {
+      var track = row.querySelector("[data-projects-track]");
+      var next = row.querySelector("[data-projects-next]");
+      if (!track || !next) {
+        return;
       }
+
+      function refresh() {
+        var overflow = track.scrollWidth - track.clientWidth > 4;
+        next.style.display = overflow ? "flex" : "none";
+      }
+
+      next.addEventListener("click", function () {
+        var maxLeft = track.scrollWidth - track.clientWidth - 4;
+        if (track.scrollLeft >= maxLeft) {
+          track.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          track.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+        }
+      });
+
+      refresh();
+      window.addEventListener("resize", refresh);
     });
   }
 
@@ -231,6 +266,7 @@
       }, 3200);
     });
   }
+
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

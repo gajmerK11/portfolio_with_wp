@@ -16,6 +16,7 @@ $portfolio_includes = array(
 	'/inc/customizer/customizer.php',              // Customizer sections and render callbacks.
 	'/inc/cpts/project-cpt.php',                   // Projects custom post type.
 	'/inc/meta-boxes/class-project-meta-box.php',  // Project details meta box.
+	'/inc/user-profile-about.php',                 // About Me content (site owner's user profile).
 );
 
 foreach ( $portfolio_includes as $portfolio_include ) {

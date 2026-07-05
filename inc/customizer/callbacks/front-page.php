@@ -51,14 +51,13 @@ function portfolio_fp_greeting_defaults() {
  */
 function portfolio_fp_icon_defaults() {
 	return array(
-		1 => array( 'url' => 'https://cdn.simpleicons.org/php',        'pos' => 'top:13%;left:39%;', 'size' => 'w-20 h-20', 'label' => 'PHP' ),
-		2 => array( 'url' => 'https://cdn.simpleicons.org/react',      'pos' => 'top:18%;left:62%;', 'size' => 'w-16 h-16', 'label' => 'React' ),
-		3 => array( 'url' => 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg', 'pos' => 'top:29%;left:76%;', 'size' => 'w-14 h-14', 'label' => 'Node.js' ),
-		4 => array( 'url' => 'https://cdn.simpleicons.org/html5',      'pos' => 'top:39%;left:16%;', 'size' => 'w-16 h-16', 'label' => 'HTML5' ),
-		5 => array( 'url' => 'https://cdn.simpleicons.org/css',        'pos' => 'top:57%;left:86%;', 'size' => 'w-14 h-14', 'label' => 'CSS' ),
-		6 => array( 'url' => 'https://cdn.simpleicons.org/javascript', 'pos' => 'top:73%;left:17%;', 'size' => 'w-16 h-16', 'label' => 'JavaScript' ),
-		7 => array( 'url' => 'https://cdn.simpleicons.org/wordpress',  'pos' => 'top:78%;left:45%;', 'size' => 'w-16 h-16', 'label' => 'WordPress' ),
-		8 => array( 'url' => 'https://cdn.simpleicons.org/python',     'pos' => 'top:78%;left:75%;', 'size' => 'w-16 h-16', 'label' => 'Python' ),
+		1 => array( 'url' => 'https://cdn.simpleicons.org/php',        'pos' => 'top:13%;left:39%;', 'size' => 'w-24 h-24', 'label' => 'PHP' ),
+		2 => array( 'url' => 'https://cdn.simpleicons.org/react',      'pos' => 'top:18%;left:62%;', 'size' => 'w-20 h-20', 'label' => 'React' ),
+		3 => array( 'url' => 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-plain-wordmark.svg', 'pos' => 'top:40%;left:15%;', 'size' => 'w-28 h-28', 'label' => 'Node.js' ),
+		4 => array( 'url' => 'https://cdn.simpleicons.org/javascript', 'pos' => 'top:57%;left:86%;', 'size' => 'w-20 h-20', 'label' => 'JavaScript' ),
+		5 => array( 'url' => 'https://cdn.simpleicons.org/wordpress',  'pos' => 'top:73%;left:20%;', 'size' => 'w-20 h-20', 'label' => 'WordPress' ),
+		6 => array( 'url' => 'https://cdn.simpleicons.org/python',     'pos' => 'top:80%;left:48%;', 'size' => 'w-20 h-20', 'label' => 'Python' ),
+		7 => array( 'url' => 'https://cdn.simpleicons.org/postgresql', 'pos' => 'top:78%;left:78%;', 'size' => 'w-20 h-20', 'label' => 'PostgreSQL' ),
 	);
 }
 

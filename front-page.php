@@ -14,7 +14,6 @@ get_header();
 
 get_template_part( 'template-parts/sections/home' );
 get_template_part( 'template-parts/sections/projects' );
-// About section will be loaded here as it is built.
-// get_template_part( 'template-parts/sections/about' );
+get_template_part( 'template-parts/sections/about' );
 
 get_footer();

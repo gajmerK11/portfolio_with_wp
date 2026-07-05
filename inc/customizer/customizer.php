@@ -25,5 +25,6 @@ function portfolio_customize_register( $wp_customize ) {
 	$portfolio_sec = get_template_directory() . '/inc/customizer/sections/';
 	require $portfolio_sec . 'front-page.php';
 	require $portfolio_sec . 'sidebar.php';
+	require $portfolio_sec . 'about.php';
 }
 add_action( 'customize_register', 'portfolio_customize_register' );

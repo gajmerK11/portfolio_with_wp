@@ -37,6 +37,6 @@ defined( 'ABSPATH' ) || exit;
 	// The blue vertical accent line at the sidebar/content divider.
 	// Shown/animated via JS on scroll.
 	?>
-	<span id="divider-line" class="hidden md:block fixed top-0 left-72 h-screen w-px bg-primary origin-top scale-y-0 z-20 pointer-events-none" aria-hidden="true"></span>
+	<span id="divider-line" class="divider-line hidden md:block fixed top-0 left-72 h-screen w-[3px] origin-top scale-y-0 z-20 pointer-events-none" aria-hidden="true"></span>
 
 	<main id="content" class="flex-1 md:ml-72 min-w-0">
