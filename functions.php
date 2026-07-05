@@ -1,0 +1,20 @@
+<?php
+/**
+ * Portfolio theme bootstrap.
+ *
+ * Keep this file minimal. Only require modular includes here —
+ * put actual logic inside the relevant file under /inc.
+ *
+ * @package Portfolio
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+$portfolio_includes = array(
+	'/inc/setup.php',    // Theme supports, menus, basic registration.
+	'/inc/enqueue.php',  // Styles and scripts.
+);
+
+foreach ( $portfolio_includes as $portfolio_include ) {
+	require_once get_template_directory() . $portfolio_include;
+}

@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   Base
+--------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Reusable component classes
+--------------------------------------------------------------- */
+@layer components {
+  /* Floating background tech icon on the home section. */
+  .floating-icon {
+    @apply absolute pointer-events-none opacity-40 grayscale;
+  }
+  .floating-icon img {
+    @apply w-full h-full object-contain transition-all duration-300;
+  }
+  .floating-icon:hover img {
+    @apply grayscale-0 opacity-100;
+  }
+
+  /* Sidebar nav item. Active state toggled by JS on scroll. */
+  .nav-item {
+    @apply flex items-center gap-4 px-8 py-2.5 rounded-full w-fit justify-center transition-colors text-gray-800 hover:text-primary;
+  }
+  .nav-item.is-active {
+    @apply text-primary bg-primary/10;
+  }
+}

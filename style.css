@@ -1,0 +1,19 @@
+/*
+Theme Name: Portfolio
+Theme URI: https://cloudcolleague.com/
+Author: Portfolio Author
+Author URI: https://cloudcolleague.com/
+Description: Custom portfolio theme built with Tailwind CSS and GSAP. Fixed sidebar, scroll-driven single-page layout.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 7.0
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: portfolio
+*/
+
+/*
+  This file holds the theme header only.
+  All real styling is compiled by Tailwind into assets/css/main.css.
+*/
