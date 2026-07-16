@@ -24,6 +24,13 @@
 
     setupDividerLine();
     setupActiveNav();
+
+    // Late-loading images (projects, quote) change the page height after
+    // triggers are built. Recalculate positions once everything has loaded
+    // so the divider line and active nav track scroll in both directions.
+    window.addEventListener("load", function () {
+      ScrollTrigger.refresh();
+    });
   }
 
   /**
