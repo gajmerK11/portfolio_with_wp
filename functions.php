@@ -15,7 +15,9 @@ $portfolio_includes = array(
 	'/inc/enqueue.php',                            // Styles and scripts.
 	'/inc/customizer/customizer.php',              // Customizer sections and render callbacks.
 	'/inc/cpts/project-cpt.php',                   // Projects custom post type.
+	'/inc/cpts/testimonial-cpt.php',               // Testimonials custom post type.
 	'/inc/meta-boxes/class-project-meta-box.php',  // Project details meta box.
+	'/inc/meta-boxes/class-testimonial-meta-box.php', // Testimonial details meta box.
 	'/inc/user-profile-about.php',                 // About Me content (site owner's user profile).
 );
 

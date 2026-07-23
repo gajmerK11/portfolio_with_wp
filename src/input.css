@@ -146,6 +146,37 @@
     animation: cv-key 0.6s ease-in-out infinite;
   }
 
+  /* Testimonial cards ("They trusted me"). Reference metrics: 300px max
+     width, 20px gap, 20px padding, centred text, and a blurred white plate
+     behind the copy instead of a solid card background. */
+  .reviews {
+    @apply relative z-10 flex flex-wrap justify-center gap-5 py-8;
+  }
+  .review-card {
+    @apply relative rounded-[10px] p-5 max-w-[300px] text-center;
+  }
+  .review-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    filter: blur(10px);
+    background-color: white;
+  }
+  .review-card .client-info {
+    @apply relative z-10 flex flex-col items-center mb-4;
+  }
+  .review-card .client-info h4 {
+    @apply text-[1.2em] font-semibold text-dark my-1;
+  }
+  .review-card .client-info p {
+    @apply text-[1.05em] text-[#777] m-1;
+  }
+  .review-card .client-linkedin {
+    @apply mt-1 text-[#777] transition-colors hover:text-[#0A66C2];
+  }
+  .review-card .client-review {
+    @apply relative z-10 text-[#333] font-medium leading-relaxed mb-4;
+  }
 
   /* Hero greeting card: no border — a blurred white backdrop floats the
      text above the animated gradient, navy square peeks out top-left. */
@@ -227,7 +258,9 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 20vh;
+  /* Reference uses 20vh; taller here so the wash reaches further up the
+     hero. The ::after veil scales with it, so the top stays soft. */
+  height: 38vh;
   pointer-events: none;
 }
 .hero-glow::before {
@@ -356,7 +389,9 @@
   height: 16px;
   background: linear-gradient(180deg, #dcdfe3 0%, #c1c5ca 45%, #a6aab0 100%);
   border-radius: 2px 2px 10px 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 .laptop-base::before {
   /* dark hinge line where the lid meets the base */
@@ -453,4 +488,3 @@
     animation: none;
   }
 }
-
