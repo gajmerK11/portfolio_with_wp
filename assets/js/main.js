@@ -25,6 +25,7 @@
     setupDividerLine();
     setupActiveNav();
     setupWorkButton();
+    setupDownloadCv();
 
     // Late-loading images (projects, quote) change the page height after
     // triggers are built. Recalculate positions once everything has loaded
@@ -237,6 +238,48 @@
         btn.classList.remove("is-grown");
       },
     });
+  }
+
+  /**
+   * The "Download CV" tab shows on the hero and again on About — the two
+   * places it has something to do — and is tucked away in between. Layering
+   * alone can't keep it out of the way over the middle sections: those are
+   * transparent, so it would show through the gaps between cards.
+   */
+  function setupDownloadCv() {
+    var tab = document.getElementById("download-cv");
+    var home = document.getElementById("home");
+    var about = document.getElementById("about");
+    if (!tab) {
+      return;
+    }
+
+    function tuck() {
+      tab.classList.add("is-tucked");
+    }
+    function show() {
+      tab.classList.remove("is-tucked");
+    }
+
+    // Leaving the hero hides it; coming back up to the hero shows it again.
+    if (home) {
+      ScrollTrigger.create({
+        trigger: home,
+        start: "bottom 60%",
+        onEnter: tuck,
+        onLeaveBack: show,
+      });
+    }
+
+    // Reaching About brings it back; scrolling back out of About hides it.
+    if (about) {
+      ScrollTrigger.create({
+        trigger: about,
+        start: "top 70%",
+        onEnter: show,
+        onLeaveBack: tuck,
+      });
+    }
   }
 
   /**

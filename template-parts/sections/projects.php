@@ -86,7 +86,7 @@ $portfolio_projects = new WP_Query(
 						<article class="project-card <?php echo esc_attr( $p_tint ); ?> snap-start shrink-0 w-[380px] sm:w-[500px] hover:sm:w-[600px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
 
 							<!-- Title -->
-							<h3 class="text-[25px] font-light text-dark mb-6">.<?php echo esc_html( $p_title ); ?></h3>
+							<h3 class="text-[25px] font-light text-dark mb-6"><?php echo esc_html( $p_title ); ?></h3>
 
 							<!-- Media: single image, or a horizontal sliding carousel for 2+ slides -->
 							<div class="flex-1 mb-6 flex items-center">

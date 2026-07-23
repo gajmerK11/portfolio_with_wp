@@ -37,9 +37,9 @@ if ( ! $portfolio_testimonials->have_posts() ) {
 	<!-- Soft animated gradient at the bottom, as on the hero -->
 	<div class="hero-glow" aria-hidden="true"></div>
 
-	<h2 class="relative z-10 text-center text-[2em] font-semibold text-dark mb-5 flex items-center justify-center gap-3">
+	<h2 class="relative z-10 text-[42px] font-semibold text-dark mb-5 flex items-center gap-3">
 		<?php esc_html_e( 'They trusted me', 'portfolio' ); ?>
-		<img class="w-[25px]" src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/review-star2.svg' ); ?>" alt="">
+		<span class="text-primary">&#10022;</span>
 	</h2>
 
 	<div class="carousel-row relative" data-carousel>

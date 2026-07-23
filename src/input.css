@@ -128,6 +128,22 @@
      reference gives its awwwards badge. "Work with me" is z-[60], above both. */
   .download-cv {
     @apply fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-badge text-white flex flex-col items-center justify-between py-4 w-[53px] h-[171px];
+    transition:
+      opacity 300ms ease-in-out,
+      transform 300ms ease-in-out;
+  }
+  /* Past the hero: slid out to the right and switched off. The sections below
+     are transparent, so hiding it outright is the only way it stays out of
+     the way — z-index alone lets it show through the gaps between cards. */
+  .download-cv.is-tucked {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(100%, -50%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .download-cv {
+      transition: none;
+    }
   }
   .download-cv .cv-mark {
     @apply font-bold text-xl leading-none;
@@ -182,6 +198,73 @@
   }
   .review-card .client-review {
     @apply relative z-10 text-[#333] font-medium leading-relaxed mb-4;
+  }
+
+  /* Experience timeline. A 1px navy rail with a node per entry; the newest
+     entry's node is filled pink with a halo. No cards — the hover state is a
+     faint tint and a hairline, in keeping with the rest of the page. */
+  /* Rail geometry is driven off two variables so the line, the nodes and the
+     text indent can't drift: the node is --xp-node wide and sits --xp-inset
+     from the entry's left edge, and the line is pinned to the node's centre. */
+  .xp-rail {
+    --xp-inset: 1rem;
+    --xp-node: 12px;
+    @apply relative m-0 p-0 list-none max-w-[760px] mx-auto;
+  }
+  .xp-rail::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--xp-inset) + var(--xp-node) / 2);
+    top: 1.9rem;
+    bottom: 1.9rem;
+    width: 1px;
+    transform: translateX(-0.5px);
+    background: theme("colors.primary");
+    opacity: 0.3;
+  }
+  .xp-entry {
+    @apply relative py-4 pr-4 mb-12 last:mb-0;
+    padding-left: calc(var(--xp-inset) + var(--xp-node) + 1.75rem);
+  }
+  .xp-node {
+    @apply absolute rounded-full bg-white;
+    left: var(--xp-inset);
+    top: 1.6rem;
+    width: var(--xp-node);
+    height: var(--xp-node);
+    border: 1px solid theme("colors.primary");
+  }
+  .xp-entry.is-current .xp-node {
+    background: theme("colors.accent");
+    border-color: theme("colors.accent");
+    box-shadow: 0 0 0 6px rgba(233, 74, 217, 0.18);
+  }
+  .xp-date {
+    @apply font-hero font-light text-[34px] leading-none text-primary m-0;
+  }
+  .xp-company {
+    @apply text-[25px] font-light text-dark mt-3 mb-1;
+  }
+  .xp-role {
+    @apply text-[13px] font-semibold uppercase tracking-[0.08em] text-neutral m-0;
+  }
+  .xp-bullets {
+    @apply mt-4 mb-0 pl-0 list-none max-w-[62ch];
+  }
+  .xp-bullets li {
+    @apply relative pl-5 mb-2 last:mb-0 text-base font-light leading-[1.7] text-[#333];
+  }
+  /* Square marker rather than a disc — it echoes the 5px-radius geometry. */
+  .xp-bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: theme("colors.primary");
+    opacity: 0.45;
   }
 
   /* Hero greeting card: no border — a blurred white backdrop floats the

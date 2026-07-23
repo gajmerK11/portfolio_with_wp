@@ -16,6 +16,7 @@ get_template_part( 'template-parts/sections/home' );
 get_template_part( 'template-parts/sections/projects' );
 get_template_part( 'template-parts/sections/testimonials' );
 get_template_part( 'template-parts/sections/quote' );
+get_template_part( 'template-parts/sections/experience' );
 get_template_part( 'template-parts/sections/about' );
 
 get_footer();
