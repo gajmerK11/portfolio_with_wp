@@ -49,32 +49,32 @@ $portfolio_groups = array(
 
 	<!-- Name + location -->
 	<?php if ( $a['name'] ) : ?>
-		<h2 class="text-4xl sm:text-5xl font-bold text-dark uppercase tracking-tight"><?php echo esc_html( $a['name'] ); ?></h2>
+		<h2 class="text-[48px] font-bold text-dark uppercase tracking-tight"><?php echo esc_html( $a['name'] ); ?></h2>
 	<?php endif; ?>
 	<?php if ( $a['location'] ) : ?>
-		<p class="text-gray-600 mt-2 text-lg"><?php echo esc_html( $a['location'] ); ?></p>
+		<p class="text-dark mt-1 text-xl"><?php echo esc_html( $a['location'] ); ?></p>
 	<?php endif; ?>
 
 	<!-- Block 1 -->
 	<?php if ( $a['lead1'] ) : ?>
-		<h3 class="text-2xl sm:text-3xl font-medium text-dark mt-10 leading-snug"><?php echo esc_html( $a['lead1'] ); ?></h3>
+		<h3 class="text-[32px] font-normal text-dark mt-10 leading-snug"><?php echo esc_html( $a['lead1'] ); ?></h3>
 	<?php endif; ?>
 	<?php if ( $a['desc1'] ) : ?>
-		<p class="text-gray-600 mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc1'] ) ); ?></p>
+		<p class="text-dark text-[22px] mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc1'] ) ); ?></p>
 	<?php endif; ?>
 
 	<!-- Block 2 -->
 	<?php if ( $a['lead2'] ) : ?>
-		<h3 class="text-2xl sm:text-3xl font-medium text-dark mt-10 leading-snug"><?php echo esc_html( $a['lead2'] ); ?></h3>
+		<h3 class="text-[32px] font-normal text-dark mt-10 leading-snug"><?php echo esc_html( $a['lead2'] ); ?></h3>
 	<?php endif; ?>
 	<?php if ( $a['desc2'] ) : ?>
-		<p class="text-gray-600 mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc2'] ) ); ?></p>
+		<p class="text-dark text-[22px] mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc2'] ) ); ?></p>
 	<?php endif; ?>
 
 	<!-- Journey link -->
 	<?php if ( $a['url'] && $a['label'] ) : ?>
 		<a href="<?php echo esc_url( $a['url'] ); ?>" target="_blank" rel="noopener noreferrer"
-			class="inline-block mt-6 text-dark font-medium underline underline-offset-4 hover:text-primary transition-colors w-fit">
+			class="inline-block mt-6 text-dark text-[22px] underline underline-offset-4 hover:text-accent transition-colors w-fit">
 			<?php echo esc_html( $a['label'] ); ?>
 		</a>
 	<?php endif; ?>
@@ -90,13 +90,13 @@ $portfolio_groups = array(
 			?>
 			<div>
 				<?php if ( $group['title'] ) : ?>
-					<h4 class="font-semibold text-dark mb-4">
-						<span class="text-neutral">.</span><?php echo esc_html( $group['title'] ); ?>
+					<h4 class="font-semibold text-dark text-2xl mb-4">
+						.<?php echo esc_html( $group['title'] ); ?>
 					</h4>
 				<?php endif; ?>
 				<div class="flex flex-wrap items-center gap-3">
 					<?php foreach ( $icons as $icon_id ) : ?>
-						<span class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg p-2">
+						<span class="h-12 flex items-center justify-center">
 							<?php
 							echo wp_get_attachment_image(
 								(int) $icon_id,

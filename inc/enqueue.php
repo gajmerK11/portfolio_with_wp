@@ -16,10 +16,10 @@ function portfolio_enqueue_assets() {
 	$theme_uri  = get_template_directory_uri();
 	$theme_path = get_template_directory();
 
-	// Google Fonts: Inter (sans) + Fira Code (mono).
+	// Google Fonts: Sora (body) + Fira Sans (hero greeting).
 	wp_enqueue_style(
 		'portfolio-fonts',
-		'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap',
+		'https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;300;400&family=Sora:wght@100..800&display=swap',
 		array(),
 		null
 	);

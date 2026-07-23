@@ -2,6 +2,10 @@
 /**
  * Left fixed sidebar: profile, nav, language switcher, social links.
  *
+ * Width and profile size come from the --sidebar-w / --profile-size variables
+ * (src/input.css), surfaced as the Tailwind `sidebar` and `profile` spacing
+ * tokens so header.php's divider line and content offset stay in step.
+ *
  * Nav items carry data-target matching the section IDs in the content
  * area. assets/js/main.js toggles .is-active as the user scrolls.
  *
@@ -26,15 +30,15 @@ $portfolio_nav = array(
 	),
 );
 ?>
-<aside class="hidden md:flex w-72 flex-col justify-between py-12 px-10 border-r border-gray-100 z-30 bg-white min-h-screen fixed left-0 top-0 bottom-0 items-center">
+<aside class="hidden md:flex w-sidebar flex-col justify-between py-14 px-8 z-30 bg-white shadow-panel min-h-screen fixed left-0 top-0 bottom-0 items-center">
 
 	<!-- Profile + nav -->
 	<div class="flex flex-col items-center w-full">
-		<div class="relative w-48 h-48 mb-16">
+		<div class="relative w-profile h-profile mb-20">
 			<?php echo portfolio_render_sidebar_profile(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
 		</div>
 
-		<nav class="flex flex-col gap-6 items-start text-xl font-medium mt-4" aria-label="<?php esc_attr_e( 'Primary', 'portfolio' ); ?>">
+		<nav class="flex flex-col gap-5 items-start text-xl font-normal mt-4" aria-label="<?php esc_attr_e( 'Primary', 'portfolio' ); ?>">
 			<?php foreach ( $portfolio_nav as $target => $item ) : ?>
 				<a
 					class="nav-item<?php echo 'home' === $target ? ' is-active' : ''; ?>"
@@ -49,8 +53,8 @@ $portfolio_nav = array(
 	</div>
 
 	<!-- Language switcher (wire up to Polylang later) -->
-	<div class="font-medium text-neutral">
-		<button class="hover:text-primary transition-colors text-xl" type="button">EN / <span class="font-mono">ने</span></button>
+	<div class="font-normal text-dark">
+		<button class="hover:text-primary hover:font-semibold transition-colors text-xl" type="button">EN / <span>ने</span></button>
 	</div>
 
 	<!-- Social links -->

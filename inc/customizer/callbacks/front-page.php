@@ -103,16 +103,16 @@ function portfolio_render_fp_greeting() {
 
 	ob_start();
 	?>
-	<div id="fp-greeting" class="font-mono text-xl sm:text-2xl leading-relaxed text-gray-800">
+	<div id="fp-greeting" class="font-hero font-light text-dark text-3xl sm:text-5xl lg:text-[3.8rem] leading-tight">
 		<?php
 		foreach ( $lines as $idx => $line ) :
 			// Indent continuation lines (03 onward) so they align under the
 			// text of line 02 rather than under its opening bracket.
-			$indent = ( $idx >= 2 ) ? ' ml-6' : '';
+			$indent = ( $idx >= 2 ) ? ' ml-7' : '';
 			?>
-			<div class="flex items-center gap-5<?php echo ( $idx < $total - 1 ) ? ' mb-3' : ''; ?>">
-				<span class="text-neutral text-base"><?php echo esc_html( str_pad( $idx + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
-				<div class="type-line font-bold<?php echo esc_attr( $indent ); ?>"><?php echo portfolio_kses_greeting( $line ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses-sanitized. ?></div>
+			<div class="flex items-center gap-5<?php echo ( $idx < $total - 1 ) ? ' mb-8' : ''; ?>">
+				<span class="text-neutral text-2xl font-normal"><?php echo esc_html( str_pad( $idx + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
+				<div class="type-line whitespace-nowrap<?php echo esc_attr( $indent ); ?>"><?php echo portfolio_kses_greeting( $line ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses-sanitized. ?></div>
 			</div>
 		<?php endforeach; ?>
 	</div>
@@ -128,7 +128,28 @@ function portfolio_render_fp_greeting() {
 function portfolio_render_fp_subtitle() {
 	$d        = portfolio_fp_greeting_defaults();
 	$subtitle = get_theme_mod( 'portfolio_fp_subtitle', $d['subtitle'] );
-	return '<p id="fp-subtitle" class="font-mono text-base sm:text-lg text-gray-800 mt-6 pl-2">' . portfolio_kses_greeting( $subtitle ) . '</p>';
+	return '<p id="fp-subtitle" class="rise-in font-hero font-light text-xl sm:text-2xl text-dark p-5 text-center">' . portfolio_kses_greeting( $subtitle ) . '</p>';
+}
+
+/**
+ * Render the "Download CV" vertical tab pinned to the right edge.
+ *
+ * Links to the file chosen in Customizer > Front Page. Rendered as a
+ * selective-refresh partial so it gets a pencil icon in the preview.
+ *
+ * @return string
+ */
+function portfolio_render_download_cv() {
+	$cv_url = get_theme_mod( 'portfolio_cv_url', '' );
+
+	ob_start();
+	?>
+	<a id="download-cv" class="download-cv" <?php echo $cv_url ? 'href="' . esc_url( $cv_url ) . '" target="_blank" rel="noopener noreferrer"' : 'href="#"'; ?>>
+		<span class="cv-mark" aria-hidden="true">&darr;</span>
+		<span class="cv-label"><?php esc_html_e( 'Download CV', 'portfolio' ); ?></span>
+	</a>
+	<?php
+	return ob_get_clean();
 }
 
 /**

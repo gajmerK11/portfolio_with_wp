@@ -28,7 +28,7 @@ $portfolio_projects = new WP_Query(
 
 	<!-- Heading -->
 	<div class="flex items-center justify-between mb-10">
-		<h2 class="text-4xl sm:text-5xl font-bold text-dark flex items-center gap-3">
+		<h2 class="text-[42px] font-semibold text-dark flex items-center gap-3">
 			<?php esc_html_e( 'My best projects', 'portfolio' ); ?>
 			<span class="text-primary">&#10022;</span>
 		</h2>
@@ -74,10 +74,10 @@ $portfolio_projects = new WP_Query(
 						}
 						$slide_count = count( $slides );
 						?>
-						<article class="project-card snap-start shrink-0 w-[380px] sm:w-[560px] rounded-4xl border border-gray-100 shadow-code-box p-8 flex flex-col">
+						<article class="project-card snap-start shrink-0 w-[380px] sm:w-[500px] hover:sm:w-[600px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
 
 							<!-- Title -->
-							<h3 class="text-2xl font-bold text-dark mb-6"><?php echo esc_html( $p_title ); ?></h3>
+							<h3 class="text-[25px] font-light text-dark mb-6">.<?php echo esc_html( $p_title ); ?></h3>
 
 							<!-- Media: single image, or a horizontal sliding carousel for 2+ slides -->
 							<div class="flex-1 mb-6 flex items-center">
@@ -133,7 +133,7 @@ $portfolio_projects = new WP_Query(
 							<div class="mt-auto">
 								<?php if ( $p_link ) : ?>
 									<a href="<?php echo esc_url( $p_link ); ?>" target="_blank" rel="noopener noreferrer"
-										class="inline-flex items-center gap-2 text-dark font-medium hover:text-primary transition-colors">
+										class="project-link inline-flex items-center gap-2 text-dark font-normal transition-all">
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
 										<?php esc_html_e( 'Link to the platform', 'portfolio' ); ?>
 									</a>

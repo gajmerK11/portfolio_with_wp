@@ -6,13 +6,37 @@
    Base
 --------------------------------------------------------------- */
 @layer base {
+  /* Sidebar geometry. The reference design sizes the sidebar and the profile
+     photo off a 12-column viewport grid (2.5 and 1.5 columns), so they scale
+     with the window; the clamps keep it usable on small laptops and stop it
+     ballooning on ultrawide screens. Exposed to Tailwind as the `sidebar` and
+     `profile` spacing tokens (w-sidebar, ml-sidebar, left-sidebar, w-profile). */
+  :root {
+    --sidebar-w: clamp(20rem, calc((100vw / 12) * 2.5), 26rem);
+    --profile-size: clamp(11rem, calc((100vw / 12) * 1.5), 15rem);
+  }
   html {
     scroll-behavior: smooth;
   }
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Sora", sans-serif;
+    font-weight: 300;
     margin: 0;
     min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* Slim custom scrollbar: grey thumb, pink on hover. */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c3c3c3;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.accent");
   }
 }
 
@@ -20,11 +44,8 @@
    Reusable component classes
 --------------------------------------------------------------- */
 @layer components {
-  /* Floating background tech icon on the home section.
-     Icons are greyscale and reveal their original brand colour on hover.
-     Each icon slowly revolves; per-icon animation-delay is set inline so
-     they drift out of sync. pointer-events re-enabled on the icon only,
-     so the gaps between icons stay click-through. */
+  /* Floating background tech icon on the home section (currently unused
+     in the template — kept for easy re-enable via Customizer icons). */
   .floating-icon {
     @apply absolute pointer-events-auto;
   }
@@ -37,38 +58,135 @@
   }
 
   /* Sidebar nav item. Active state toggled by JS on scroll.
-     Icon sits outside the label; on active the icon turns primary
-     and the label gets a bordered white pill. */
+     Active: pink text, label on a pale panel with a pink left border. */
   .nav-item {
-    @apply flex items-center gap-3 text-gray-800 transition-colors hover:text-primary;
+    @apply flex items-center gap-4 text-dark transition-colors hover:text-accent;
   }
   .nav-item .nav-icon {
-    @apply w-6 h-6 shrink-0 transition-colors;
+    @apply w-9 h-9 shrink-0 transition-colors;
   }
   .nav-item .nav-label {
-    @apply px-5 py-1.5 rounded-full border border-transparent transition-all;
+    @apply px-4 py-2 rounded-[5px] border-l-2 border-transparent transition-all text-left whitespace-nowrap;
   }
   .nav-item.is-active {
-    @apply text-primary;
+    @apply text-accent;
   }
   .nav-item.is-active .nav-label {
-    @apply bg-white border-gray-200 shadow-sm;
+    @apply bg-paper border-accent;
+  }
+
+  /* Fixed "Work with me" pill (top-right). Arrow is a long inline SVG
+     clipped to its tip; hover slides more of the shaft out. */
+  .work-btn {
+    @apply fixed top-[5%] right-[5%] z-40 flex items-center bg-accent rounded-[5px] px-6 py-1.5 overflow-hidden cursor-pointer transition-all duration-200 hover:bg-accent-dark;
+  }
+  .work-btn h4 {
+    @apply text-white font-bold text-2xl leading-normal m-0;
+  }
+  .work-btn .work-arrow {
+    @apply flex w-5 overflow-hidden;
+  }
+  .work-btn .work-arrow svg {
+    width: 300px;
+    min-width: 300px;
+    margin-left: -280px;
+    transition: margin-left 150ms ease-in-out;
+  }
+  .work-btn:hover .work-arrow svg {
+    margin-left: -260px;
+  }
+  /* Grows + drifts inward when the About section is on screen. */
+  .work-btn.is-grown {
+    top: 40%;
+    right: 10%;
+    scale: 1.3;
+    transition: 300ms ease-in-out;
+  }
+
+  /* "Download CV" vertical tab pinned to the right edge (awwwards-style). */
+  .download-cv {
+    @apply fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-badge text-white flex flex-col items-center gap-2 py-5 w-[53px] hover:w-[60px] transition-all;
+    writing-mode: vertical-rl;
+  }
+  .download-cv .cv-mark {
+    @apply font-bold text-xl;
+    writing-mode: horizontal-tb;
+  }
+  .download-cv .cv-label {
+    @apply text-sm tracking-widest;
+  }
+
+  /* "Learn more" scroll cue: white bar, arrow inside a pink square. */
+  .learn-more {
+    @apply flex items-center bg-white rounded-[5px] pl-4 pr-3 py-2 cursor-pointer transition-all duration-200;
+  }
+  .learn-more .lm-arrow {
+    @apply bg-accent text-white w-10 h-10 flex items-center justify-center rounded-[5px] ml-5 transition-colors;
+  }
+  .learn-more:hover .lm-arrow {
+    @apply bg-accent-dark;
+  }
+
+  /* Hero greeting card: no border — a blurred white backdrop floats the
+     text above the animated gradient, navy square peeks out top-left. */
+  .hero-card {
+    @apply relative rounded-[5px] p-[30px];
+  }
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    filter: blur(30px);
+    background-color: white;
   }
 }
 
 /* ---------------------------------------------------------------
-   Divider accent line (grows/retracts with scroll via GSAP scrub)
+   Hero bottom — soft animated gradient glow
 --------------------------------------------------------------- */
+.hero-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20vh;
+  pointer-events: none;
+}
+.hero-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(137deg, #ffffff, #ffffff, #cbdcff, #ffffff);
+  background-size: 240% 240%;
+  animation: gradient-drift 5s ease infinite;
+}
+.hero-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #ffffff, #ffffff00);
+}
+@keyframes gradient-drift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Progress divider line (grows with scroll via GSAP scrub)
+--------------------------------------------------------------- */
+.divider-track {
+  background: #f1f1f1;
+}
 .divider-line {
-  background: linear-gradient(
-    180deg,
-    #eb4526 0%,
-    #ff7a3d 35%,
-    #ffb347 55%,
-    #eb4526 100%
-  );
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(235, 69, 38, 0.35);
+  background: theme("colors.primary");
 }
 
 /* ---------------------------------------------------------------
@@ -82,16 +200,22 @@
 .projects-scroll::-webkit-scrollbar {
   display: none;
 }
-/* Fixed-width cards; each project row is its own carousel and the arrow slides
-   through the row's four when they overflow the viewport. */
+/* Flat pastel cards that widen slightly on hover with a soft inset shadow. */
 .project-card {
-  background: linear-gradient(135deg, #e9f6f2 0%, #ffffff 70%);
+  background-image: linear-gradient(#ffffff, #a8e0e08c, #ffec8b7e, #ffffff);
 }
 .project-card:nth-child(3n + 2) {
-  background: linear-gradient(135deg, #fdeee0 0%, #ffffff 70%);
+  background-image: linear-gradient(#ffffff, #ffe6c5, #ffffff);
 }
 .project-card:nth-child(3n + 3) {
-  background: linear-gradient(135deg, #f7f2e6 0%, #ffffff 70%);
+  background-image: linear-gradient(#ffffff, #e2f8ff, #ffffff);
+}
+.project-card:hover {
+  box-shadow: inset 5px 5px 40px 0px rgba(0, 0, 0, 0.066);
+}
+.project-card .project-link:hover {
+  color: #746aff;
+  text-decoration: underline;
 }
 
 /* Media carousel: a horizontal track that translates one slide at a time.
@@ -228,8 +352,33 @@
   }
 }
 
+/* Subtitle + Learn more rise in after the greeting has typed. */
+.rise-in {
+  opacity: 0;
+  animation: rise-up 2s ease-in-out 3s forwards;
+}
+@keyframes rise-up {
+  from {
+    opacity: 0;
+    transform: translateY(6vh);
+  }
+  85% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    opacity: 1;
+    animation: none;
+  }
+}
+
 /* ---------------------------------------------------------------
-   Read more — bobbing arrow
+   Learn more — bobbing arrow
 --------------------------------------------------------------- */
 .read-more-arrow {
   animation: bob 1.3s ease-in-out infinite;

@@ -24,6 +24,7 @@
 
     setupDividerLine();
     setupActiveNav();
+    setupWorkButton();
 
     // Late-loading images (projects, quote) change the page height after
     // triggers are built. Recalculate positions once everything has loaded
@@ -199,6 +200,28 @@
           }
         },
       });
+    });
+  }
+
+  /**
+   * Grow and drift the fixed "Work with me" button inward while the
+   * About section is on screen, back to the corner when leaving.
+   */
+  function setupWorkButton() {
+    var btn = document.querySelector(".work-btn");
+    var about = document.getElementById("about");
+    if (!btn || !about) {
+      return;
+    }
+    ScrollTrigger.create({
+      trigger: about,
+      start: "top 30%",
+      onEnter: function () {
+        btn.classList.add("is-grown");
+      },
+      onLeaveBack: function () {
+        btn.classList.remove("is-grown");
+      },
     });
   }
 

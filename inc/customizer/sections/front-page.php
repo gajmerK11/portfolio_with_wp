@@ -64,6 +64,20 @@ $wp_customize->add_control( 'portfolio_fp_subtitle', array(
 ) );
 
 /* -----------------------------------------------------------------------
+ * Download CV file (the vertical tab on the right edge links to it).
+ * -------------------------------------------------------------------- */
+$wp_customize->add_setting( 'portfolio_cv_url', array(
+	'default'           => '',
+	'sanitize_callback' => 'esc_url_raw',
+	'transport'         => 'postMessage',
+) );
+$wp_customize->add_control( new WP_Customize_Upload_Control( $wp_customize, 'portfolio_cv_url', array(
+	'label'       => __( 'CV file', 'portfolio' ),
+	'description' => __( 'Upload the CV (PDF) that the "Download CV" tab links to.', 'portfolio' ),
+	'section'     => 'portfolio_front_page',
+) ) );
+
+/* -----------------------------------------------------------------------
  * Floating tech icons (8 image controls). Empty = built-in default.
  * -------------------------------------------------------------------- */
 $portfolio_icon_defaults = portfolio_fp_icon_defaults();
@@ -98,6 +112,13 @@ if ( isset( $wp_customize->selective_refresh ) ) {
 		'container_inclusive' => true,
 		'settings'            => array( 'portfolio_fp_subtitle' ),
 		'render_callback'     => 'portfolio_render_fp_subtitle',
+	) );
+
+	$wp_customize->selective_refresh->add_partial( 'portfolio_cv_partial', array(
+		'selector'            => '#download-cv',
+		'container_inclusive' => true,
+		'settings'            => array( 'portfolio_cv_url' ),
+		'render_callback'     => 'portfolio_render_download_cv',
 	) );
 
 	$wp_customize->selective_refresh->add_partial( 'portfolio_fp_icons_partial', array(
