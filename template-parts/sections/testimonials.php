@@ -28,7 +28,11 @@ if ( ! $portfolio_testimonials->have_posts() ) {
 	return;
 }
 ?>
-<section id="testimonials" class="section relative pb-10 px-10 overflow-hidden">
+<?php
+// z-50 for the same reason as the projects section: the cards pass over the
+// fixed "Download CV" tab rather than under it.
+?>
+<section id="testimonials" class="section relative z-50 pb-10 px-10 overflow-hidden">
 
 	<!-- Soft animated gradient at the bottom, as on the hero -->
 	<div class="hero-glow" aria-hidden="true"></div>
@@ -38,7 +42,8 @@ if ( ! $portfolio_testimonials->have_posts() ) {
 		<img class="w-[25px]" src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/review-star2.svg' ); ?>" alt="">
 	</h2>
 
-	<div class="reviews">
+	<div class="carousel-row relative" data-carousel>
+		<div class="reviews projects-scroll" data-carousel-track>
 		<?php
 		while ( $portfolio_testimonials->have_posts() ) :
 			$portfolio_testimonials->the_post();
@@ -68,6 +73,19 @@ if ( ! $portfolio_testimonials->have_posts() ) {
 				<?php endif; ?>
 			</article>
 		<?php endwhile; ?>
+		</div>
+
+		<!-- Slide arrows (rendered only when the row overflows; faded in on hover) -->
+		<button type="button" data-carousel-prev
+			class="carousel-nav hidden absolute -left-2 top-1/2 -translate-y-1/2 z-20"
+			aria-label="<?php esc_attr_e( 'Previous testimonials', 'portfolio' ); ?>">
+			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+		</button>
+		<button type="button" data-carousel-next
+			class="carousel-nav hidden absolute -right-2 top-1/2 -translate-y-1/2 z-20"
+			aria-label="<?php esc_attr_e( 'Next testimonials', 'portfolio' ); ?>">
+			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+		</button>
 	</div>
 </section>
 <?php

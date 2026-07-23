@@ -240,36 +240,127 @@
   }
 
   /**
-   * Each project row is its own carousel. The row's > arrow slides that row one
-   * viewport forward (wrapping at the end), and is only shown when the row
-   * actually overflows (i.e. its 4 cards don't all fit on screen).
+   * Every [data-carousel] row — project rows and the testimonials row — is its
+   * own carousel. The < and > arrows slide it one viewport at a time and it
+   * loops endlessly in both directions.
+   *
+   * The loop is done by appending a second copy of the cards, then silently
+   * snapping the scroll position back by one copy's width once the user has
+   * scrolled past it. Because the copy is identical, the reset is invisible and
+   * the row keeps sliding the same way instead of rewinding to the start.
+   *
+   * Arrows only exist when the row actually overflows; CSS fades them in on
+   * hover (see .carousel-nav).
    */
   function setupProjectsScroll() {
-    var rows = document.querySelectorAll(".project-row");
+    var rows = document.querySelectorAll("[data-carousel]");
     if (!rows.length) {
       return;
     }
 
     rows.forEach(function (row) {
-      var track = row.querySelector("[data-projects-track]");
-      var next = row.querySelector("[data-projects-next]");
-      if (!track || !next) {
+      var track = row.querySelector("[data-carousel-track]");
+      var prev = row.querySelector("[data-carousel-prev]");
+      var next = row.querySelector("[data-carousel-next]");
+      if (!track) {
         return;
       }
 
-      function refresh() {
-        var overflow = track.scrollWidth - track.clientWidth > 4;
-        next.style.display = overflow ? "flex" : "none";
+      var looping = false;
+      var settle = null;
+
+      /** Width of one copy of the cards. */
+      function loopWidth() {
+        return looping ? track.scrollWidth / 2 : track.scrollWidth;
       }
 
-      next.addEventListener("click", function () {
-        var maxLeft = track.scrollWidth - track.clientWidth - 4;
-        if (track.scrollLeft >= maxLeft) {
-          track.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          track.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+      /** Jump without animating, whatever scroll-behavior the CSS asks for. */
+      function jumpTo(left) {
+        var previous = track.style.scrollBehavior;
+        track.style.scrollBehavior = "auto";
+        track.scrollLeft = left;
+        track.style.scrollBehavior = previous;
+      }
+
+      function addClones() {
+        if (looping) {
+          return;
         }
+        Array.prototype.slice.call(track.children).forEach(function (card) {
+          var clone = card.cloneNode(true);
+          clone.classList.add("is-clone");
+          clone.setAttribute("aria-hidden", "true");
+          // Clones are decorative duplicates — keep them off the tab order.
+          clone.querySelectorAll("a, button").forEach(function (el) {
+            el.setAttribute("tabindex", "-1");
+          });
+          track.appendChild(clone);
+        });
+        looping = true;
+      }
+
+      function removeClones() {
+        if (!looping) {
+          return;
+        }
+        track.querySelectorAll(".is-clone").forEach(function (clone) {
+          clone.remove();
+        });
+        looping = false;
+      }
+
+      function refresh() {
+        // Measure the real cards, so the clones can't make a row look like it
+        // overflows when it doesn't.
+        removeClones();
+        var overflow = track.scrollWidth - track.clientWidth > 4;
+
+        [prev, next].forEach(function (btn) {
+          if (btn) {
+            btn.style.display = overflow ? "flex" : "none";
+          }
+        });
+        // Centre the cards while they all fit; once the row scrolls, centring
+        // would clip the first card out of reach.
+        track.classList.toggle("is-centered", !overflow);
+
+        if (overflow) {
+          addClones();
+        } else {
+          jumpTo(0);
+        }
+      }
+
+      // After any scroll settles, fold the position back into the first copy.
+      track.addEventListener("scroll", function () {
+        window.clearTimeout(settle);
+        settle = window.setTimeout(function () {
+          if (!looping) {
+            return;
+          }
+          var width = loopWidth();
+          if (track.scrollLeft >= width) {
+            jumpTo(track.scrollLeft - width);
+          }
+        }, 140);
       });
+
+      if (next) {
+        next.addEventListener("click", function () {
+          track.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+        });
+      }
+
+      if (prev) {
+        prev.addEventListener("click", function () {
+          // Going back from the very start: hop forward a whole copy first, so
+          // there is something to scroll back into.
+          if (looping && track.scrollLeft <= 4) {
+            jumpTo(loopWidth());
+          }
+          track.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
+        });
+      }
 
       refresh();
       window.addEventListener("resize", refresh);

@@ -37,8 +37,8 @@ defined( 'ABSPATH' ) || exit;
 	// Scroll progress line at the sidebar/content divider: a light grey
 	// track with a navy bar that grows with scroll (via JS).
 	?>
-	<span class="divider-track hidden md:block fixed top-0 left-sidebar h-screen w-[2px] z-20 pointer-events-none" aria-hidden="true"></span>
-	<span id="divider-line" class="divider-line hidden md:block fixed top-0 left-sidebar h-screen w-[2px] origin-top scale-y-0 z-20 pointer-events-none" aria-hidden="true"></span>
+	<span class="divider-track hidden md:block fixed top-0 left-sidebar h-screen w-[2px] z-[55] pointer-events-none" aria-hidden="true"></span>
+	<span id="divider-line" class="divider-line hidden md:block fixed top-0 left-sidebar h-screen w-[2px] origin-top scale-y-0 z-[55] pointer-events-none" aria-hidden="true"></span>
 
 	<!-- Fixed top-right CTA -->
 	<a class="work-btn group" href="#about">

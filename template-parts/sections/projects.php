@@ -24,7 +24,12 @@ $portfolio_projects = new WP_Query(
 	)
 );
 ?>
-<section id="projects" data-section="projects" class="section relative min-h-screen flex flex-col justify-center p-10 overflow-hidden">
+<?php
+// z-50 lifts the whole section above the fixed "Download CV" tab (z-40), so
+// the cards scroll over it instead of under it. The hero is left unlifted, so
+// the tab stays on top — and hoverable — there.
+?>
+<section id="projects" data-section="projects" class="section relative z-50 min-h-screen flex flex-col justify-center p-10 overflow-hidden">
 
 	<!-- Heading -->
 	<div class="flex items-center justify-between mb-10">
@@ -41,12 +46,16 @@ $portfolio_projects = new WP_Query(
 		$portfolio_rows = array_chunk( $portfolio_projects->posts, 4 );
 		foreach ( $portfolio_rows as $portfolio_row ) :
 			?>
-			<div class="project-row relative mb-8">
-				<div class="projects-scroll flex gap-6 overflow-x-auto pb-4 snap-x scroll-smooth" data-projects-track>
+			<div class="project-row carousel-row relative mb-8" data-carousel>
+				<div class="projects-scroll flex gap-6 overflow-x-auto pb-4 snap-x scroll-smooth" data-carousel-track>
 					<?php
-					foreach ( $portfolio_row as $portfolio_post ) :
+					foreach ( $portfolio_row as $portfolio_index => $portfolio_post ) :
 						$post = $portfolio_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- scoped loop var for template tags.
 						setup_postdata( $post );
+
+						// Pastel tint baked into a class rather than :nth-child, so the
+						// clones the infinite carousel appends keep their card's colour.
+						$p_tint = 'tint-' . ( $portfolio_index % 3 + 1 );
 
 						$p_title  = get_post_meta( get_the_ID(), '_portfolio_project_title', true );
 						$p_title  = ( '' !== $p_title ) ? $p_title : get_the_title();
@@ -74,7 +83,7 @@ $portfolio_projects = new WP_Query(
 						}
 						$slide_count = count( $slides );
 						?>
-						<article class="project-card snap-start shrink-0 w-[380px] sm:w-[500px] hover:sm:w-[600px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
+						<article class="project-card <?php echo esc_attr( $p_tint ); ?> snap-start shrink-0 w-[380px] sm:w-[500px] hover:sm:w-[600px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
 
 							<!-- Title -->
 							<h3 class="text-[25px] font-light text-dark mb-6">.<?php echo esc_html( $p_title ); ?></h3>
@@ -146,9 +155,14 @@ $portfolio_projects = new WP_Query(
 					<?php endforeach; ?>
 				</div>
 
-				<!-- Row slide-next arrow (shown only when the row overflows) -->
-				<button type="button" data-projects-next
-					class="projects-next hidden absolute -right-2 top-1/2 -translate-y-1/2 z-20 bg-dark text-white w-12 h-12 items-center justify-center rounded-full shadow-lg hover:bg-primary transition-colors"
+				<!-- Row slide arrows (rendered only when the row overflows; faded in on hover) -->
+				<button type="button" data-carousel-prev
+					class="carousel-nav hidden absolute -left-2 top-1/2 -translate-y-1/2 z-20"
+					aria-label="<?php esc_attr_e( 'Previous projects', 'portfolio' ); ?>">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+				</button>
+				<button type="button" data-carousel-next
+					class="carousel-nav hidden absolute -right-2 top-1/2 -translate-y-1/2 z-20"
 					aria-label="<?php esc_attr_e( 'Next projects', 'portfolio' ); ?>">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
 				</button>

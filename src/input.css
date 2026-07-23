@@ -80,7 +80,7 @@
      the overflow. On hover the shaft slides back in and draws itself across
      the full width of the button, between the two lines of the label. */
   .work-btn {
-    @apply fixed top-[5%] right-[5%] z-40 flex items-center bg-primary hover:bg-accent-dark rounded-[5px] px-[25px] py-[5px] overflow-hidden cursor-pointer transition-all duration-200;
+    @apply fixed top-[5%] right-[5%] z-[60] flex items-center bg-primary hover:bg-accent-dark rounded-[5px] px-[25px] py-[5px] overflow-hidden cursor-pointer transition-all duration-200;
   }
   /* Sora, as the reference reports for this button. 24px on a 150% line box
      gives the 72px content height in its computed box (159.34 x 82 overall
@@ -122,6 +122,10 @@
   /* "Download CV" tab pinned to the right edge, laid out like the awwwards
      badge it sits in place of: a 53x171 teal panel with a horizontal mark at
      the top and the word below it set vertically, reading bottom-to-top. */
+  /* Layering: the tab sits at z-40, above the hero, so it stays visible and
+     hoverable there. The projects and testimonials sections are lifted to
+     z-50, so their cards scroll over the top of it — the same layering the
+     reference gives its awwwards badge. "Work with me" is z-[60], above both. */
   .download-cv {
     @apply fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-badge text-white flex flex-col items-center justify-between py-4 w-[53px] h-[171px];
   }
@@ -149,11 +153,13 @@
   /* Testimonial cards ("They trusted me"). Reference metrics: 300px max
      width, 20px gap, 20px padding, centred text, and a blurred white plate
      behind the copy instead of a solid card background. */
+  /* One horizontal track, same mechanics as a project row: cards keep their
+     300px width and the row scrolls rather than wrapping. */
   .reviews {
-    @apply relative z-10 flex flex-wrap justify-center gap-5 py-8;
+    @apply relative z-10 flex justify-start gap-5 py-8 overflow-x-auto snap-x scroll-smooth;
   }
   .review-card {
-    @apply relative rounded-[10px] p-5 max-w-[300px] text-center;
+    @apply relative shrink-0 snap-start rounded-[10px] p-5 w-[300px] text-center;
   }
   .review-card::after {
     content: "";
@@ -310,14 +316,50 @@
 .projects-scroll::-webkit-scrollbar {
   display: none;
 }
+/* Carousel arrows: hidden until the pointer is over the row, so a static page
+   stays clean. Keyboard focus reveals them too, otherwise they would be
+   unreachable by tab. JS sets display:none on rows that don't overflow. */
+.is-centered {
+  justify-content: center;
+}
+
+.carousel-nav {
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: theme("colors.dark");
+  color: #fff;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  opacity: 0;
+  transition:
+    opacity 200ms ease-in-out,
+    background-color 200ms ease-in-out;
+}
+.carousel-nav:hover {
+  background: theme("colors.primary");
+}
+.carousel-row:hover .carousel-nav,
+.carousel-nav:focus-visible {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .carousel-nav {
+    transition: none;
+  }
+}
+
 /* Flat pastel cards that widen slightly on hover with a soft inset shadow. */
-.project-card {
+.project-card,
+.project-card.tint-1 {
   background-image: linear-gradient(#ffffff, #a8e0e08c, #ffec8b7e, #ffffff);
 }
-.project-card:nth-child(3n + 2) {
+.project-card.tint-2 {
   background-image: linear-gradient(#ffffff, #ffe6c5, #ffffff);
 }
-.project-card:nth-child(3n + 3) {
+.project-card.tint-3 {
   background-image: linear-gradient(#ffffff, #e2f8ff, #ffffff);
 }
 .project-card:hover {
