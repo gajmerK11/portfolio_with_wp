@@ -43,10 +43,8 @@ defined( 'ABSPATH' ) || exit;
 	<!-- Fixed top-right CTA -->
 	<a class="work-btn group" href="#about">
 		<h4><?php esc_html_e( 'Work', 'portfolio' ); ?> <br> <?php esc_html_e( 'with me', 'portfolio' ); ?></h4>
-		<span class="work-arrow ml-3" aria-hidden="true">
-			<svg viewBox="0 0 300 24" fill="none" stroke="currentColor" class="text-white h-6">
-				<path d="M2 12h288m0 0l-8-8m8 8l-8 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
-			</svg>
+		<span class="work-arrow" aria-hidden="true">
+			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/aright.svg' ); ?>" alt="">
 		</span>
 	</a>
 

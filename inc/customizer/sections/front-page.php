@@ -22,7 +22,7 @@ $wp_customize->add_section( 'portfolio_front_page', array(
  *   - Wrap a word in a span with class "text-primary" to colour it orange.
  *   - Use <br> to drop text onto the next numbered line.
  * -------------------------------------------------------------------- */
-$portfolio_greet_help = __( 'Use a <span> with class "text-primary" to colour a word orange. Use <br> to drop to the next numbered line.', 'portfolio' );
+$portfolio_greet_help = __( 'Use a <span> with class "text-primary" to colour a word orange. Use <br> to drop to the next numbered line. Drop in an icon with [icon:backend] or [icon:wordpress].', 'portfolio' );
 
 $wp_customize->add_setting( 'portfolio_fp_row1', array(
 	'default'           => $d['row1'],

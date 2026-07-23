@@ -75,25 +75,41 @@
     @apply bg-paper border-accent;
   }
 
-  /* Fixed "Work with me" pill (top-right). Arrow is a long inline SVG
-     clipped to its tip; hover slides more of the shaft out. */
+  /* Fixed "Work with me" pill (top-right). The arrow is assets/img/aright.svg
+     scaled to 300px and pulled left so only its head shows; the button clips
+     the overflow. On hover the shaft slides back in and draws itself across
+     the full width of the button, between the two lines of the label. */
   .work-btn {
-    @apply fixed top-[5%] right-[5%] z-40 flex items-center bg-accent rounded-[5px] px-6 py-1.5 overflow-hidden cursor-pointer transition-all duration-200 hover:bg-accent-dark;
+    @apply fixed top-[5%] right-[5%] z-40 flex items-center bg-primary hover:bg-accent-dark rounded-[5px] px-[25px] py-[5px] overflow-hidden cursor-pointer transition-all duration-200;
   }
+  /* Sora, as the reference reports for this button. 24px on a 150% line box
+     gives the 72px content height in its computed box (159.34 x 82 overall
+     with 5px/25px padding). */
   .work-btn h4 {
-    @apply text-white font-bold text-2xl leading-normal m-0;
+    @apply font-sans text-white font-bold text-2xl leading-[150%] m-0;
   }
+  /* The arrow overlays the label rather than sitting in the flex flow, so it
+     spans the whole button and crosses between the two lines of text. It is
+     right-aligned inside a window that stops at the padding edge; hovering
+     pushes it further right, so the head runs out to the button edge and more
+     shaft is pulled in behind it. */
   .work-btn .work-arrow {
-    @apply flex w-5 overflow-hidden;
+    @apply absolute left-0 right-0 top-1/2 -translate-y-1/2 flex justify-end overflow-hidden pointer-events-none;
   }
-  .work-btn .work-arrow svg {
-    width: 300px;
-    min-width: 300px;
-    margin-left: -280px;
-    transition: margin-left 150ms ease-in-out;
+  .work-btn .work-arrow img {
+    width: 240px;
+    min-width: 240px;
+    max-width: none;
+    margin-right: 25px;
+    transition: margin-right 250ms ease-in-out;
   }
-  .work-btn:hover .work-arrow svg {
-    margin-left: -260px;
+  .work-btn:hover .work-arrow img {
+    margin-right: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .work-btn .work-arrow img {
+      transition: none;
+    }
   }
   /* Grows + drifts inward when the About section is on screen. */
   .work-btn.is-grown {
@@ -103,34 +119,43 @@
     transition: 300ms ease-in-out;
   }
 
-  /* "Download CV" vertical tab pinned to the right edge (awwwards-style). */
+  /* "Download CV" tab pinned to the right edge, laid out like the awwwards
+     badge it sits in place of: a 53x171 teal panel with a horizontal mark at
+     the top and the word below it set vertically, reading bottom-to-top. */
   .download-cv {
-    @apply fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-badge text-white flex flex-col items-center gap-2 py-5 w-[53px] hover:w-[60px] transition-all;
-    writing-mode: vertical-rl;
+    @apply fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-badge text-white flex flex-col items-center justify-between py-4 w-[53px] h-[171px];
   }
   .download-cv .cv-mark {
-    @apply font-bold text-xl;
-    writing-mode: horizontal-tb;
+    @apply font-bold text-xl leading-none;
   }
   .download-cv .cv-label {
-    @apply text-sm tracking-widest;
+    @apply text-[13px] font-bold tracking-wide;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+  /* Letters need to be inline-block to take a transform of their own. */
+  .download-cv .cv-letter {
+    @apply inline-block;
+  }
+  /* Hover: the mark beats, the letters press in one after another. The
+     label is rotated, so its local X reads as horizontal on screen. */
+  .download-cv:hover .cv-mark {
+    animation: cv-heartbeat 1.2s ease-in-out infinite;
+  }
+  .download-cv:hover .cv-letter {
+    animation: cv-key 0.6s ease-in-out infinite;
   }
 
-  /* "Learn more" scroll cue: white bar, arrow inside a pink square. */
-  .learn-more {
-    @apply flex items-center bg-white rounded-[5px] pl-4 pr-3 py-2 cursor-pointer transition-all duration-200;
-  }
-  .learn-more .lm-arrow {
-    @apply bg-accent text-white w-10 h-10 flex items-center justify-center rounded-[5px] ml-5 transition-colors;
-  }
-  .learn-more:hover .lm-arrow {
-    @apply bg-accent-dark;
-  }
 
   /* Hero greeting card: no border — a blurred white backdrop floats the
      text above the animated gradient, navy square peeks out top-left. */
   .hero-card {
     @apply relative rounded-[5px] p-[30px];
+  }
+  /* Inline icon inside a greeting line. Reference sizing: 1.2rem tall,
+     pulled 5px back towards the word it belongs to. */
+  .hero-card .hero-ico {
+    @apply inline-block h-[1.2rem] w-auto ml-[-5px] mr-1 align-baseline;
   }
   .hero-card::before {
     content: "";
@@ -139,6 +164,58 @@
     z-index: -1;
     filter: blur(30px);
     background-color: white;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Download CV tab — hover animations
+--------------------------------------------------------------- */
+@keyframes cv-heartbeat {
+  0%,
+  30%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.18);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+}
+@keyframes cv-key {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .download-cv:hover .cv-mark,
+  .download-cv:hover .cv-letter {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Hero accent square — drifting blue gradient
+
+   Same treatment as the reference design's `.orange` block: a four-stop
+   137deg ramp oversized to 240% so the animation can slide the paint
+   diagonally across the tile instead of recolouring it.
+--------------------------------------------------------------- */
+.hero-square {
+  background: linear-gradient(137deg, #ffffff, #b8ceff, #004fff, #ffffff);
+  background-size: 240% 240%;
+  animation: gradient-drift 5s ease infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-square {
+    animation: none;
+    background-position: 50% 50%;
   }
 }
 
@@ -377,23 +454,3 @@
   }
 }
 
-/* ---------------------------------------------------------------
-   Learn more — bobbing arrow
---------------------------------------------------------------- */
-.read-more-arrow {
-  animation: bob 1.3s ease-in-out infinite;
-}
-@keyframes bob {
-  0%,
-  100% {
-    transform: translateY(-3px);
-  }
-  50% {
-    transform: translateY(3px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .read-more-arrow {
-    animation: none;
-  }
-}

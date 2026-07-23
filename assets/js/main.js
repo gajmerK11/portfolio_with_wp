@@ -57,10 +57,24 @@
       return { row: row, content: row.querySelector(".type-line") };
     });
 
+    // Lock the block to its finished width before any clipping starts.
+    // The rows are laid out full-width at this point (hidden only by
+    // opacity), so this is exactly the width it ends at. Without it the
+    // centred block would drift sideways as each line's clip changes
+    // which row is the widest.
+    var lockedWidth = Math.ceil(greeting.getBoundingClientRect().width);
+    if (lockedWidth > 0) {
+      greeting.style.width = lockedWidth + "px";
+    }
+    function unlockWidth() {
+      greeting.style.width = "";
+    }
+
     var i = 0;
     function typeRow() {
       if (i >= items.length) {
         html.classList.remove("pre-typing");
+        unlockWidth();
         return;
       }
       var it = items[i];
