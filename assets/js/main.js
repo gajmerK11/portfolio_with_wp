@@ -29,10 +29,11 @@
     // once the page has settled so the URL stays bare.
     stripHash();
 
-    setupPreloader();
+    // Hold the typing intro until the logo overlay is gone, so the greeting
+    // starts on a visible page rather than behind the preloader.
+    setupPreloader(setupTypingIntro);
 
     // Run without GSAP so these still work if the CDN fails.
-    setupTypingIntro();
     setupProjectsScroll();
     setupProjectCarousels();
     setupNavClicks();
@@ -60,10 +61,18 @@
    * Hold the "Kumar" logo overlay over the page until the window has finished
    * loading (with a short minimum so it doesn't just flash), then fade it out
    * and take it out of the flow. Reduced motion skips the minimum hold.
+   *
+   * onDone runs once the overlay is fully gone, so callers can start on-screen
+   * animations (the typing intro) only after the page is actually visible. When
+   * there is no overlay, onDone runs immediately.
+   *
+   * @param {Function} [onDone] Called after the overlay has been removed.
    */
-  function setupPreloader() {
+  function setupPreloader(onDone) {
+    var done = typeof onDone === "function" ? onDone : function () {};
     var pl = document.getElementById("site-preloader");
     if (!pl) {
+      done();
       return;
     }
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -75,9 +84,10 @@
       var wait = Math.max(0, minShow - (Date.now() - start));
       setTimeout(function () {
         pl.classList.add("is-hidden");
-        // Remove from the flow once the fade finishes.
+        // Remove from the flow once the fade finishes, then hand off.
         setTimeout(function () {
           pl.style.display = "none";
+          done();
         }, 520);
       }, wait);
     }
