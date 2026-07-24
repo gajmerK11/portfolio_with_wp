@@ -58,12 +58,15 @@
   }
 
   /* Sidebar nav item. Active state toggled by JS on scroll.
-     Default black; navy (same as "Work with me") on hover and when selected. */
+     Default black; navy on hover/selected. Selected icon enlarges. */
   .nav-item {
     @apply flex items-center gap-4 text-dark transition-colors hover:text-primary;
   }
   .nav-item .nav-icon {
-    @apply w-9 h-9 shrink-0 transition-colors;
+    @apply w-9 h-9 shrink-0 origin-center;
+    transition:
+      color 200ms ease,
+      transform 250ms ease;
   }
   .nav-item .nav-label {
     @apply px-4 py-2 rounded-[5px] border-l-2 border-transparent transition-all text-left whitespace-nowrap;
@@ -71,8 +74,16 @@
   .nav-item.is-active {
     @apply text-primary;
   }
+  .nav-item.is-active .nav-icon {
+    transform: scale(1.45);
+  }
   .nav-item.is-active .nav-label {
     @apply bg-paper border-primary;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-item .nav-icon {
+      transition: color 200ms ease;
+    }
   }
 
   /* Fixed "Work with me" pill (top-right). The arrow is assets/img/aright.svg
@@ -164,6 +175,18 @@
   }
   .download-cv:hover .cv-letter {
     animation: cv-key 0.6s ease-in-out infinite;
+  }
+
+  /* Floating WhatsApp — matches reference .cookie-manager-btn size/position
+     (30×30 icon, fixed bottom:20px right:20px). */
+  .whatsapp-btn {
+    @apply fixed bottom-5 right-5 z-[70] flex items-center justify-center px-[15px] py-[10px] bg-transparent border-0 no-underline transition-transform duration-150;
+  }
+  .whatsapp-btn svg {
+    @apply w-[30px] h-[30px] block;
+  }
+  .whatsapp-btn:hover {
+    @apply scale-110;
   }
 
   /* Testimonial cards ("They trusted me"). Reference metrics: 300px max
@@ -438,14 +461,31 @@
   .contact-panel .cp-num h2 {
     @apply text-neutral text-lg font-normal m-0 mb-3;
   }
-  .contact-panel .cp-num a {
+  .contact-panel .cp-num > a {
     @apply block w-fit no-underline;
   }
   .contact-panel .cp-num h3 {
     @apply font-hero text-[22px] font-normal text-dark leading-tight my-1 transition-colors;
   }
+  .contact-panel .cp-num a:hover,
   .contact-panel .cp-num a:hover h3 {
-    @apply text-primary;
+    @apply text-[#6b63ff];
+  }
+  .contact-panel .cp-phones {
+    @apply flex flex-wrap items-center gap-x-1;
+  }
+  .contact-panel .cp-phones a {
+    @apply text-inherit transition-colors;
+  }
+  /* Sized to sit inside the ( ) next to the phone line. */
+  .contact-panel .cp-wa {
+    @apply inline-flex items-center justify-center shrink-0;
+  }
+  .contact-panel .cp-wa svg {
+    @apply w-5 h-5 block;
+  }
+  .contact-panel .cp-wa:hover {
+    @apply scale-110;
   }
 
   /* Form */
