@@ -58,9 +58,9 @@
   }
 
   /* Sidebar nav item. Active state toggled by JS on scroll.
-     Active: pink text, label on a pale panel with a pink left border. */
+     Default black; navy (same as "Work with me") on hover and when selected. */
   .nav-item {
-    @apply flex items-center gap-4 text-dark transition-colors hover:text-accent;
+    @apply flex items-center gap-4 text-dark transition-colors hover:text-primary;
   }
   .nav-item .nav-icon {
     @apply w-9 h-9 shrink-0 transition-colors;
@@ -69,10 +69,10 @@
     @apply px-4 py-2 rounded-[5px] border-l-2 border-transparent transition-all text-left whitespace-nowrap;
   }
   .nav-item.is-active {
-    @apply text-accent;
+    @apply text-primary;
   }
   .nav-item.is-active .nav-label {
-    @apply bg-paper border-accent;
+    @apply bg-paper border-primary;
   }
 
   /* Fixed "Work with me" pill (top-right). The arrow is assets/img/aright.svg
@@ -419,10 +419,10 @@
     @apply flex items-center gap-3 m-5 bg-transparent border-0 cursor-pointer p-0;
   }
   .contact-panel .cp-back-ico {
-    @apply flex items-center justify-center w-11 h-11 rounded-xl bg-dark text-white shrink-0 transition-transform duration-200;
+    @apply flex items-center justify-center w-8 h-8 rounded-lg bg-dark text-white shrink-0 overflow-hidden transition-transform duration-200;
   }
   .contact-panel .cp-back-ico svg {
-    @apply w-5 h-5;
+    @apply w-full h-full;
   }
   .contact-panel .cp-back:hover .cp-back-ico {
     @apply -translate-x-1;
@@ -445,7 +445,7 @@
     @apply font-hero text-[22px] font-normal text-dark leading-tight my-1 transition-colors;
   }
   .contact-panel .cp-num a:hover h3 {
-    @apply text-accent;
+    @apply text-primary;
   }
 
   /* Form */
@@ -481,7 +481,7 @@
     @apply mx-8 my-1 text-green-700 text-sm;
   }
   .contact-panel .cp-form button[type="submit"] {
-    @apply float-right mr-8 bg-accent text-white border-0 rounded-[5px] px-8 py-4 text-lg cursor-pointer transition-transform duration-200;
+    @apply float-right mr-8 bg-primary text-white border-0 rounded-[5px] px-8 py-4 text-lg cursor-pointer transition-transform duration-200;
   }
   .contact-panel .cp-form button[type="submit"]:hover {
     @apply scale-105 bg-accent-dark;
