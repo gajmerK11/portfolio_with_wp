@@ -52,14 +52,14 @@ $portfolio_nav = array(
 
 	<nav class="flex flex-col gap-5 items-start text-xl font-normal" aria-label="<?php esc_attr_e( 'Primary', 'portfolio' ); ?>">
 		<?php foreach ( $portfolio_nav as $target => $item ) : ?>
-			<a
+			<button
+				type="button"
 				class="nav-item<?php echo 'home' === $target ? ' is-active' : ''; ?>"
-				href="#<?php echo esc_attr( $target ); ?>"
 				data-target="<?php echo esc_attr( $target ); ?>"
 			>
 				<svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><?php echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG path. ?></svg>
 				<span class="nav-label"><?php echo esc_html( $item['label'] ); ?></span>
-			</a>
+			</button>
 		<?php endforeach; ?>
 	</nav>
 

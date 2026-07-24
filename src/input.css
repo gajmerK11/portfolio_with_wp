@@ -60,7 +60,8 @@
   /* Sidebar nav item. Active state toggled by JS on scroll.
      Default black; navy on hover/selected. Selected icon enlarges. */
   .nav-item {
-    @apply flex items-center gap-4 text-dark transition-colors hover:text-primary;
+    @apply flex items-center gap-4 text-dark transition-colors hover:text-primary bg-transparent border-0 p-0 m-0 cursor-pointer text-left;
+    font: inherit;
   }
   .nav-item .nav-icon {
     @apply w-9 h-9 shrink-0 origin-center;
