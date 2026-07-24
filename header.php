@@ -29,6 +29,22 @@ defined( 'ABSPATH' ) || exit;
 <body <?php body_class( 'bg-white text-dark antialiased' ); ?>>
 <?php wp_body_open(); ?>
 
+<!-- Initial-load logo overlay: covers the page until the window has loaded,
+     then fades out (assets/js/main.js -> setupPreloader). -->
+<div id="site-preloader" class="site-preloader" role="status" aria-label="<?php esc_attr_e( 'Loading', 'portfolio' ); ?>">
+	<div class="pl-logo">
+		<svg class="pl-mark" viewBox="0 0 24 28" aria-hidden="true">
+			<!-- Left column: large top + smaller bottom; right column: middle
+			     square jutting toward the wordmark. -->
+			<rect x="0" y="0" width="12" height="12"></rect>
+			<rect x="1" y="18" width="9" height="9"></rect>
+			<rect x="13" y="10" width="9" height="9"></rect>
+		</svg>
+		<span class="pl-text">Kumar</span>
+	</div>
+</div>
+<noscript><style>#site-preloader{display:none !important;}</style></noscript>
+
 <div class="relative w-full min-h-screen md:flex">
 
 	<?php get_template_part( 'template-parts/sidebar' ); ?>

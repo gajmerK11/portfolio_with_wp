@@ -327,6 +327,72 @@
   }
 
   /* ---------------------------------------------------------------
+     Initial-load logo overlay (preloader)
+
+     Full-screen white cover with the "Kumar" logo — a stepped pixel mark
+     (echoing the hero square) beside the wordmark — shown until the window
+     loads, then faded away by setupPreloader().
+  --------------------------------------------------------------- */
+  .site-preloader {
+    @apply fixed inset-0 z-[9999] grid place-items-center bg-white;
+    transition: opacity 500ms ease;
+  }
+  .site-preloader.is-hidden {
+    @apply opacity-0 pointer-events-none;
+  }
+  /* One font-size drives the whole lockup so the mark keeps its alignment to
+     the wordmark at every viewport width. */
+  .site-preloader .pl-logo {
+    @apply flex items-center;
+    gap: 0.08em;
+    font-size: clamp(48px, 8vw, 92px);
+    animation: pl-in 600ms ease-out both;
+  }
+  .site-preloader .pl-mark {
+    height: 0.86em;
+    width: auto;
+    color: #0004d7;
+    fill: currentColor;
+    /* Raised so the middle square sits at the cap line of the "K". */
+    transform: translateY(-0.2em);
+    /* Pulse between its blue and grey while the overlay is up. */
+    animation: pl-pulse 1.2s ease-in-out infinite;
+  }
+  .site-preloader .pl-text {
+    @apply font-hero font-bold leading-none tracking-tight;
+    font-size: 1em;
+    color: #0004d7;
+    animation: pl-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pl-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes pl-pulse {
+    0%,
+    100% {
+      color: #0004d7;
+    }
+    50% {
+      color: #a8adbf;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .site-preloader .pl-logo,
+    .site-preloader .pl-mark,
+    .site-preloader .pl-text {
+      animation: none;
+      color: #0004d7;
+    }
+  }
+
+  /* ---------------------------------------------------------------
      Contact panel — slide-in drawer (opened by "Work with me")
 
      Replicates the reference `.contact` drawer: a right-anchored white panel

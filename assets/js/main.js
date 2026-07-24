@@ -29,6 +29,8 @@
     // once the page has settled so the URL stays bare.
     stripHash();
 
+    setupPreloader();
+
     // Run without GSAP so these still work if the CDN fails.
     setupTypingIntro();
     setupProjectsScroll();
@@ -52,6 +54,39 @@
     window.addEventListener("load", function () {
       ScrollTrigger.refresh();
     });
+  }
+
+  /**
+   * Hold the "Kumar" logo overlay over the page until the window has finished
+   * loading (with a short minimum so it doesn't just flash), then fade it out
+   * and take it out of the flow. Reduced motion skips the minimum hold.
+   */
+  function setupPreloader() {
+    var pl = document.getElementById("site-preloader");
+    if (!pl) {
+      return;
+    }
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Hold long enough for a couple of pulse cycles before fading.
+    var minShow = reduce ? 0 : 2400;
+    var start = Date.now();
+
+    function hide() {
+      var wait = Math.max(0, minShow - (Date.now() - start));
+      setTimeout(function () {
+        pl.classList.add("is-hidden");
+        // Remove from the flow once the fade finishes.
+        setTimeout(function () {
+          pl.style.display = "none";
+        }, 520);
+      }, wait);
+    }
+
+    if (document.readyState === "complete") {
+      hide();
+    } else {
+      window.addEventListener("load", hide);
+    }
   }
 
   /**
@@ -417,13 +452,16 @@
         })
         .then(function (res) {
           if (res && res.success) {
-            succ.textContent = (res.data && res.data.message) || "Message sent. Thank you!";
+            succ.textContent =
+              (res.data && res.data.message) || "Message sent. Thank you!";
             form.reset();
             form.querySelectorAll(".cp-cour").forEach(function (l) {
               l.classList.remove("is-shown");
             });
           } else {
-            err.textContent = (res && res.data && res.data.message) || "Something went wrong. Please try again.";
+            err.textContent =
+              (res && res.data && res.data.message) ||
+              "Something went wrong. Please try again.";
           }
         })
         .catch(function () {
@@ -598,7 +636,6 @@
       }, 3200);
     });
   }
-
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
