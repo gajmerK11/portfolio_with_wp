@@ -541,8 +541,10 @@
 .divider-track {
   background: #f1f1f1;
 }
+/* Scroll progress line: homepage square gradient from the reference
+   (.orange in stylett.css) — light blue #b8ceff into darker blue #004fff. */
 .divider-line {
-  background: theme("colors.primary");
+  background: linear-gradient(to bottom, #b8ceff 0%, #004fff 100%);
 }
 
 /* ---------------------------------------------------------------

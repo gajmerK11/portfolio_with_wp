@@ -54,3 +54,52 @@ function portfolio_contact_submit() {
 }
 add_action( 'wp_ajax_portfolio_contact', 'portfolio_contact_submit' );
 add_action( 'wp_ajax_nopriv_portfolio_contact', 'portfolio_contact_submit' );
+
+/**
+ * Contact details shown in the panel and used as the mail recipient.
+ * Email doubles as the wp_mail destination (see portfolio_contact_submit).
+ */
+add_filter(
+	'portfolio_contact_email',
+	function () {
+		return 'gajmerk9@gmail.com';
+	}
+);
+add_filter(
+	'portfolio_contact_phone',
+	function () {
+		return '9803280069';
+	}
+);
+
+/**
+ * Route wp_mail through SMTP when credentials are defined in wp-config.php.
+ *
+ * Local (and stock PHP mail on Windows) does not deliver to real inboxes, so a
+ * real send to Gmail needs SMTP. Define these in wp-config.php — NEVER in the
+ * theme — using a Gmail App Password (not the account password):
+ *
+ *   define( 'PORTFOLIO_SMTP_HOST', 'smtp.gmail.com' );
+ *   define( 'PORTFOLIO_SMTP_PORT', 587 );
+ *   define( 'PORTFOLIO_SMTP_SECURE', 'tls' );
+ *   define( 'PORTFOLIO_SMTP_USER', 'gajmerk9@gmail.com' );
+ *   define( 'PORTFOLIO_SMTP_PASS', 'your-16-char-app-password' );
+ *
+ * @param PHPMailer\PHPMailer\PHPMailer $phpmailer Mailer instance (by ref).
+ */
+function portfolio_contact_smtp( $phpmailer ) {
+	if ( ! defined( 'PORTFOLIO_SMTP_HOST' ) || ! PORTFOLIO_SMTP_HOST ) {
+		return;
+	}
+	$phpmailer->isSMTP();
+	$phpmailer->Host       = PORTFOLIO_SMTP_HOST;
+	$phpmailer->Port       = defined( 'PORTFOLIO_SMTP_PORT' ) ? PORTFOLIO_SMTP_PORT : 587;
+	$phpmailer->SMTPSecure = defined( 'PORTFOLIO_SMTP_SECURE' ) ? PORTFOLIO_SMTP_SECURE : 'tls';
+	$phpmailer->SMTPAuth   = true;
+	$phpmailer->Username   = defined( 'PORTFOLIO_SMTP_USER' ) ? PORTFOLIO_SMTP_USER : '';
+	$phpmailer->Password   = defined( 'PORTFOLIO_SMTP_PASS' ) ? PORTFOLIO_SMTP_PASS : '';
+	// Gmail requires the From address to be the authenticated account.
+	$phpmailer->From     = $phpmailer->Username;
+	$phpmailer->FromName = get_bloginfo( 'name' );
+}
+add_action( 'phpmailer_init', 'portfolio_contact_smtp' );

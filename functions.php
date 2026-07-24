@@ -21,6 +21,7 @@ $portfolio_includes = array(
 	'/inc/meta-boxes/class-testimonial-meta-box.php', // Testimonial details meta box.
 	'/inc/meta-boxes/class-skill-meta-box.php',    // Skill category details meta box.
 	'/inc/user-profile-about.php',                 // About Me content (site owner's user profile).
+	'/inc/user-profile-cv.php',                    // CV uploader (site owner's user profile) + Download CV source.
 	'/inc/experience.php',                         // Experience entries (admin screen + data access).
 	'/inc/contact-form.php',                       // Contact panel submit handler (admin-ajax + wp_mail).
 );

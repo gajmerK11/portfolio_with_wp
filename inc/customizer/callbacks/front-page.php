@@ -190,11 +190,14 @@ function portfolio_render_fp_subtitle() {
  * @return string
  */
 function portfolio_render_download_cv() {
-	$cv_url = get_theme_mod( 'portfolio_cv_url', '' );
+	// Prefer the CV uploaded on the site owner's profile; fall back to the
+	// legacy Customizer setting when the CV module is unavailable.
+	$cv_url  = function_exists( 'portfolio_cv_url' ) ? portfolio_cv_url() : get_theme_mod( 'portfolio_cv_url', '' );
+	$cv_name = function_exists( 'portfolio_cv_download_name' ) ? portfolio_cv_download_name() : '';
 
 	ob_start();
 	?>
-	<a id="download-cv" class="download-cv" <?php echo $cv_url ? 'href="' . esc_url( $cv_url ) . '" target="_blank" rel="noopener noreferrer"' : 'href="#"'; ?>>
+	<a id="download-cv" class="download-cv" <?php echo $cv_url ? 'href="' . esc_url( $cv_url ) . '" download="' . esc_attr( $cv_name ? $cv_name : 'CV' ) . '" target="_blank" rel="noopener noreferrer"' : 'href="#"'; ?>>
 		<span class="cv-mark" aria-hidden="true">CV.</span>
 		<?php
 		// One span per letter so they can be bounced in sequence on hover.

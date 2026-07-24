@@ -56,9 +56,9 @@ $cp_phone = apply_filters( 'portfolio_contact_phone', '' );
 			<input type="text" name="name" placeholder="<?php esc_attr_e( 'Your full name', 'portfolio' ); ?>" required>
 		</div>
 
-		<p class="cp-cour"><?php esc_html_e( 'Your project', 'portfolio' ); ?></p>
+		<p class="cp-cour"><?php esc_html_e( 'Your message', 'portfolio' ); ?></p>
 		<div class="cp-group">
-			<textarea name="message" placeholder="<?php esc_attr_e( 'How can I help you?', 'portfolio' ); ?>" required></textarea>
+			<textarea name="message" placeholder="<?php esc_attr_e( 'Your message', 'portfolio' ); ?>" required></textarea>
 		</div>
 
 		<p class="cp-err" role="alert"></p>
