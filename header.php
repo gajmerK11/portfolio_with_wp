@@ -40,8 +40,8 @@ defined( 'ABSPATH' ) || exit;
 	<span class="divider-track hidden md:block fixed top-0 left-sidebar h-screen w-[2px] z-[55] pointer-events-none" aria-hidden="true"></span>
 	<span id="divider-line" class="divider-line hidden md:block fixed top-0 left-sidebar h-screen w-[2px] origin-top scale-y-0 z-[55] pointer-events-none" aria-hidden="true"></span>
 
-	<!-- Fixed top-right CTA -->
-	<a class="work-btn group" href="#about">
+	<!-- Fixed top-right CTA — opens the slide-in contact panel -->
+	<a class="work-btn group" href="#contact" data-contact-open aria-haspopup="dialog">
 		<h4><?php esc_html_e( 'Work', 'portfolio' ); ?> <br> <?php esc_html_e( 'with me', 'portfolio' ); ?></h4>
 		<span class="work-arrow" aria-hidden="true">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/aright.svg' ); ?>" alt="">
@@ -50,5 +50,8 @@ defined( 'ABSPATH' ) || exit;
 
 	<!-- Download CV side tab — editable via Customizer > Front Page -->
 	<?php echo portfolio_render_download_cv(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
+
+	<!-- Slide-in contact panel (opened by "Work with me") -->
+	<?php get_template_part( 'template-parts/contact' ); ?>
 
 	<main id="content" class="flex-1 md:ml-sidebar min-w-0">

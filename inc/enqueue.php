@@ -60,5 +60,15 @@ function portfolio_enqueue_assets() {
 		$js_ver,
 		true
 	);
+
+	// Contact panel: admin-ajax endpoint + nonce for the form submit.
+	wp_localize_script(
+		'portfolio-main',
+		'PortfolioContact',
+		array(
+			'ajax'  => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'portfolio_contact' ),
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'portfolio_enqueue_assets' );

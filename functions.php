@@ -22,6 +22,7 @@ $portfolio_includes = array(
 	'/inc/meta-boxes/class-skill-meta-box.php',    // Skill category details meta box.
 	'/inc/user-profile-about.php',                 // About Me content (site owner's user profile).
 	'/inc/experience.php',                         // Experience entries (admin screen + data access).
+	'/inc/contact-form.php',                       // Contact panel submit handler (admin-ajax + wp_mail).
 );
 
 foreach ( $portfolio_includes as $portfolio_include ) {

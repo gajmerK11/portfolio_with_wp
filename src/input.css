@@ -326,6 +326,104 @@
     @apply text-[18px] font-normal text-dark;
   }
 
+  /* ---------------------------------------------------------------
+     Contact panel — slide-in drawer (opened by "Work with me")
+
+     Replicates the reference `.contact` drawer: a right-anchored white panel
+     that slides in from off-screen over a dark overlay. Colours use the theme
+     tokens (navy borders, pink Send button) rather than the reference's reds.
+  --------------------------------------------------------------- */
+  .contact-back {
+    @apply fixed inset-0 z-[95] bg-black/40 opacity-0 invisible transition-opacity duration-300;
+  }
+  .contact-back.is-open {
+    @apply opacity-100 visible;
+  }
+  .contact-panel {
+    @apply fixed top-0 right-0 z-[100] h-screen w-[min(560px,100vw)] bg-white overflow-y-auto;
+    transform: translateX(100%);
+    transition: transform 500ms ease;
+  }
+  .contact-panel.is-open {
+    transform: translateX(0);
+  }
+
+  /* Back */
+  .contact-panel .cp-back {
+    @apply flex items-center gap-3 m-5 bg-transparent border-0 cursor-pointer p-0;
+  }
+  .contact-panel .cp-back-ico {
+    @apply flex items-center justify-center w-11 h-11 rounded-xl bg-dark text-white shrink-0 transition-transform duration-200;
+  }
+  .contact-panel .cp-back-ico svg {
+    @apply w-5 h-5;
+  }
+  .contact-panel .cp-back:hover .cp-back-ico {
+    @apply -translate-x-1;
+  }
+  .contact-panel .cp-back-label {
+    @apply text-lg font-normal text-dark;
+  }
+
+  /* Contacts block */
+  .contact-panel .cp-num {
+    @apply mx-8 py-6 border-b border-gray-300;
+  }
+  .contact-panel .cp-num h2 {
+    @apply text-neutral text-lg font-normal m-0 mb-3;
+  }
+  .contact-panel .cp-num a {
+    @apply block w-fit no-underline;
+  }
+  .contact-panel .cp-num h3 {
+    @apply font-hero text-[22px] font-normal text-dark leading-tight my-1 transition-colors;
+  }
+  .contact-panel .cp-num a:hover h3 {
+    @apply text-accent;
+  }
+
+  /* Form */
+  .contact-panel .cp-form {
+    @apply relative pb-10;
+  }
+  .contact-panel .cp-group {
+    @apply mx-8 my-4;
+  }
+  .contact-panel .cp-form input,
+  .contact-panel .cp-form textarea {
+    @apply w-full font-hero font-light text-[18px] p-4 rounded-[10px] border border-primary bg-white text-dark;
+    box-sizing: border-box;
+  }
+  .contact-panel .cp-form textarea {
+    @apply h-28 resize-none;
+  }
+  .contact-panel .cp-form input:focus,
+  .contact-panel .cp-form textarea:focus {
+    @apply outline-none border-b-4 border-b-primary;
+  }
+  /* Floating label: hidden until its field has content. */
+  .contact-panel .cp-cour {
+    @apply mx-8 mt-3 mb-0 text-[13px] text-dark opacity-0 h-0 overflow-hidden transition-opacity duration-300;
+  }
+  .contact-panel .cp-cour.is-shown {
+    @apply opacity-100 h-auto;
+  }
+  .contact-panel .cp-err {
+    @apply mx-8 my-1 text-[#FF2E00] text-sm;
+  }
+  .contact-panel .cp-succ {
+    @apply mx-8 my-1 text-green-700 text-sm;
+  }
+  .contact-panel .cp-form button[type="submit"] {
+    @apply float-right mr-8 bg-accent text-white border-0 rounded-[5px] px-8 py-4 text-lg cursor-pointer transition-transform duration-200;
+  }
+  .contact-panel .cp-form button[type="submit"]:hover {
+    @apply scale-105 bg-accent-dark;
+  }
+  .contact-panel .cp-form button[type="submit"]:disabled {
+    @apply opacity-60 scale-100 cursor-not-allowed;
+  }
+
   /* Hero greeting card: no border — a blurred white backdrop floats the
      text above the animated gradient, navy square peeks out top-left. */
   .hero-card {

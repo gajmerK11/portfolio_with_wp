@@ -34,6 +34,7 @@
     setupProjectsScroll();
     setupProjectCarousels();
     setupNavClicks();
+    setupContactPanel();
 
     if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
       return;
@@ -301,6 +302,138 @@
         onLeaveBack: tuck,
       });
     }
+  }
+
+  /**
+   * Slide-in contact panel. "Work with me" (and any [data-contact-open]) opens
+   * it; the Back button, the overlay, and Escape close it. Floating labels
+   * reveal as their field fills. Submit posts to admin-ajax (wp_mail).
+   */
+  function setupContactPanel() {
+    var panel = document.querySelector(".contact-panel");
+    var overlay = document.querySelector(".contact-back");
+    if (!panel || !overlay) {
+      return;
+    }
+    var openers = document.querySelectorAll("[data-contact-open]");
+    var closers = document.querySelectorAll("[data-contact-close]");
+
+    function open(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      panel.classList.add("is-open");
+      overlay.classList.add("is-open");
+      panel.setAttribute("aria-hidden", "false");
+      var first = panel.querySelector("input, textarea");
+      if (first) {
+        // Wait out the slide before focusing, so the page doesn't jump.
+        setTimeout(function () {
+          first.focus();
+        }, 520);
+      }
+    }
+    function close() {
+      panel.classList.remove("is-open");
+      overlay.classList.remove("is-open");
+      panel.setAttribute("aria-hidden", "true");
+    }
+
+    openers.forEach(function (btn) {
+      btn.addEventListener("click", open);
+    });
+    closers.forEach(function (btn) {
+      btn.addEventListener("click", close);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && panel.classList.contains("is-open")) {
+        close();
+      }
+    });
+
+    // Floating labels: show the .cp-cour above a field once it has content.
+    var form = document.getElementById("cp-form");
+    if (!form) {
+      return;
+    }
+    form.querySelectorAll("input, textarea").forEach(function (field) {
+      var group = field.closest(".cp-group");
+      var label = group ? group.previousElementSibling : null;
+      if (!label || !label.classList.contains("cp-cour")) {
+        return;
+      }
+      field.addEventListener("input", function () {
+        label.classList.toggle("is-shown", field.value.trim() !== "");
+      });
+    });
+
+    setupContactSubmit(form, close);
+  }
+
+  /** Wire the contact form's AJAX submit + success / error messaging. */
+  function setupContactSubmit(form, close) {
+    var cfg = window.PortfolioContact;
+    var err = form.querySelector(".cp-err");
+    var succ = form.querySelector(".cp-succ");
+    var button = form.querySelector('button[type="submit"]');
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      err.textContent = "";
+      succ.textContent = "";
+
+      var data = new FormData(form);
+      var email = (data.get("email") || "").trim();
+      var name = (data.get("name") || "").trim();
+      var message = (data.get("message") || "").trim();
+
+      if (!email || !name || !message) {
+        err.textContent = "Please fill in every field.";
+        return;
+      }
+      if (!cfg || !cfg.ajax) {
+        err.textContent = "Contact form is not configured.";
+        return;
+      }
+
+      var body = new URLSearchParams();
+      body.set("action", "portfolio_contact");
+      body.set("nonce", cfg.nonce);
+      body.set("email", email);
+      body.set("name", name);
+      body.set("message", message);
+
+      button.disabled = true;
+      var original = button.textContent;
+      button.textContent = "Sending…";
+
+      fetch(cfg.ajax, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      })
+        .then(function (r) {
+          return r.json();
+        })
+        .then(function (res) {
+          if (res && res.success) {
+            succ.textContent = (res.data && res.data.message) || "Message sent. Thank you!";
+            form.reset();
+            form.querySelectorAll(".cp-cour").forEach(function (l) {
+              l.classList.remove("is-shown");
+            });
+          } else {
+            err.textContent = (res && res.data && res.data.message) || "Something went wrong. Please try again.";
+          }
+        })
+        .catch(function () {
+          err.textContent = "Network error. Please try again.";
+        })
+        .finally(function () {
+          button.disabled = false;
+          button.textContent = original;
+        });
+    });
   }
 
   /**
