@@ -23,9 +23,6 @@ if ( empty( $portfolio_experience ) ) {
 ?>
 <section id="experience" data-section="experience" class="section relative z-50 py-24 px-10 overflow-hidden">
 
-	<!-- Soft animated gradient along the bottom, as on the hero -->
-	<div class="hero-glow" aria-hidden="true"></div>
-
 	<h2 class="relative z-10 text-[42px] font-semibold text-dark flex items-center gap-3 mb-14">
 		<?php esc_html_e( "Where I've worked", 'portfolio' ); ?>
 		<span class="text-primary">&#10022;</span>

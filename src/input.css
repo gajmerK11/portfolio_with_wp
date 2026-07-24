@@ -267,6 +267,65 @@
     opacity: 0.45;
   }
 
+  /* ---------------------------------------------------------------
+     Skills — category cards
+
+     A responsive grid of flat white cards. Each has a rounded-square chip
+     icon beside the category title, then skills stacked with circular icons.
+     Chip and skill icons are normalized (object-contain inside a fixed box)
+     so mismatched uploaded logos still form a tidy square / uniform circles.
+  --------------------------------------------------------------- */
+  .skills-grid {
+    @apply grid gap-6 max-w-[1100px];
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  /* Flat card, but it lifts on hover: a soft navy-tinted shadow and a navy
+     border pick it out without any loud colour — same restraint as the rest
+     of the page. */
+  .skill-card {
+    @apply bg-white rounded-[5px] border border-[#ececec] p-7 transition duration-200;
+  }
+  .skill-card:hover {
+    @apply -translate-y-1 border-primary/25;
+    box-shadow: 0 18px 40px -20px rgba(2, 0, 115, 0.28);
+  }
+  /* Header sits over a hairline rule, so the title reads as a label for the
+     list beneath it rather than floating. */
+  .skill-head {
+    @apply flex items-center gap-3 mb-4 pb-4 border-b border-[#f0f0f2];
+  }
+  /* Rounded-square category chip: pale navy tint, logo contained inside. */
+  .skill-chip {
+    @apply flex items-center justify-center shrink-0 w-11 h-11 rounded-lg overflow-hidden;
+    background: #eef1ff;
+  }
+  .skill-chip img {
+    @apply w-[26px] h-[26px] object-contain;
+  }
+  .skill-cat-title {
+    @apply font-hero text-[22px] font-semibold text-dark m-0;
+  }
+  .skill-list {
+    @apply flex flex-col gap-2.5 m-0 p-0 list-none;
+  }
+  .skill-row {
+    @apply flex items-center gap-3;
+  }
+  /* Bare skill icon — no chip/circle behind it, just the logo. Greyed out at
+     rest (as the testimonial LinkedIn icon), full colour on hover. */
+  .skill-ico {
+    @apply flex items-center justify-center shrink-0 w-9 h-9;
+  }
+  .skill-ico img {
+    @apply w-9 h-9 object-contain grayscale opacity-70 transition duration-200;
+  }
+  .skill-row:hover .skill-ico img {
+    @apply grayscale-0 opacity-100;
+  }
+  .skill-name {
+    @apply text-[18px] font-normal text-dark;
+  }
+
   /* Hero greeting card: no border — a blurred white backdrop floats the
      text above the animated gradient, navy square peeks out top-left. */
   .hero-card {

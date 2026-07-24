@@ -28,6 +28,10 @@ $portfolio_nav = array(
 		'label' => __( 'Experience', 'portfolio' ),
 		'icon'  => '<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>',
 	),
+	'skills'   => array(
+		'label' => __( 'Skills', 'portfolio' ),
+		'icon'  => '<path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>',
+	),
 	'about'    => array(
 		'label' => __( 'About Me', 'portfolio' ),
 		'icon'  => '<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>',

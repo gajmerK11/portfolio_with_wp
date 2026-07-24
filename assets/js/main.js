@@ -10,7 +10,25 @@
 (function () {
   "use strict";
 
+  /**
+   * Drop any #section hash from the address bar without scrolling or adding a
+   * history entry. Keeps the single-page URL clean as the user moves around.
+   */
+  function stripHash() {
+    if (window.location.hash && window.history && window.history.replaceState) {
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search,
+      );
+    }
+  }
+
   function init() {
+    // A hash may arrive from a bookmarked link or a previous visit; clear it
+    // once the page has settled so the URL stays bare.
+    stripHash();
+
     // Run without GSAP so these still work if the CDN fails.
     setupTypingIntro();
     setupProjectsScroll();
@@ -182,6 +200,9 @@
         if (section) {
           e.preventDefault();
           section.scrollIntoView({ behavior: "smooth", block: "start" });
+          // preventDefault stops the jump, but the click can still leave the
+          // hash behind — strip it so the URL never shows #section.
+          stripHash();
         }
       });
     });

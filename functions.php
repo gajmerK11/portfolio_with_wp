@@ -16,8 +16,10 @@ $portfolio_includes = array(
 	'/inc/customizer/customizer.php',              // Customizer sections and render callbacks.
 	'/inc/cpts/project-cpt.php',                   // Projects custom post type.
 	'/inc/cpts/testimonial-cpt.php',               // Testimonials custom post type.
+	'/inc/cpts/skill-cpt.php',                     // Skills custom post type.
 	'/inc/meta-boxes/class-project-meta-box.php',  // Project details meta box.
 	'/inc/meta-boxes/class-testimonial-meta-box.php', // Testimonial details meta box.
+	'/inc/meta-boxes/class-skill-meta-box.php',    // Skill category details meta box.
 	'/inc/user-profile-about.php',                 // About Me content (site owner's user profile).
 	'/inc/experience.php',                         // Experience entries (admin screen + data access).
 );
