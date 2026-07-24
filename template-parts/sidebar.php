@@ -34,32 +34,30 @@ $portfolio_nav = array(
 	),
 );
 ?>
-<aside class="hidden md:flex w-sidebar flex-col justify-between py-14 px-8 z-30 bg-white shadow-panel min-h-screen fixed left-0 top-0 bottom-0 items-center">
+<aside class="hidden md:flex w-sidebar flex-col justify-between py-14 px-8 z-30 bg-white min-h-screen fixed left-0 top-0 bottom-0 items-center">
 
-	<!-- Profile + nav -->
-	<div class="flex flex-col items-center w-full">
-		<div class="relative w-profile h-profile mb-20">
-			<?php echo portfolio_render_sidebar_profile(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
-		</div>
-
-		<nav class="flex flex-col gap-5 items-start text-xl font-normal mt-4" aria-label="<?php esc_attr_e( 'Primary', 'portfolio' ); ?>">
-			<?php foreach ( $portfolio_nav as $target => $item ) : ?>
-				<a
-					class="nav-item<?php echo 'home' === $target ? ' is-active' : ''; ?>"
-					href="#<?php echo esc_attr( $target ); ?>"
-					data-target="<?php echo esc_attr( $target ); ?>"
-				>
-					<svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><?php echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG path. ?></svg>
-					<span class="nav-label"><?php echo esc_html( $item['label'] ); ?></span>
-				</a>
-			<?php endforeach; ?>
-		</nav>
+	<?php
+	// Profile, nav and socials are three separate flex children so the aside's
+	// justify-between spreads them across the full column: photo at the top,
+	// nav on the centre line, socials at the foot. Nothing is nudged with
+	// fixed margins, so the layout re-balances itself at any viewport height.
+	?>
+	<div class="relative w-profile h-profile">
+		<?php echo portfolio_render_sidebar_profile(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
 	</div>
 
-	<!-- Language switcher (wire up to Polylang later) -->
-	<div class="font-normal text-dark">
-		<button class="hover:text-primary hover:font-semibold transition-colors text-xl" type="button">EN / <span>ने</span></button>
-	</div>
+	<nav class="flex flex-col gap-5 items-start text-xl font-normal" aria-label="<?php esc_attr_e( 'Primary', 'portfolio' ); ?>">
+		<?php foreach ( $portfolio_nav as $target => $item ) : ?>
+			<a
+				class="nav-item<?php echo 'home' === $target ? ' is-active' : ''; ?>"
+				href="#<?php echo esc_attr( $target ); ?>"
+				data-target="<?php echo esc_attr( $target ); ?>"
+			>
+				<svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><?php echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG path. ?></svg>
+				<span class="nav-label"><?php echo esc_html( $item['label'] ); ?></span>
+			</a>
+		<?php endforeach; ?>
+	</nav>
 
 	<!-- Social links -->
 	<div class="flex items-center justify-center gap-6 text-dark">

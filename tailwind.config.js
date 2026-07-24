@@ -30,7 +30,6 @@ module.exports = {
       },
       boxShadow: {
         "code-box": "0 4px 20px rgba(0,0,0,0.05)",
-        panel: "5px 5px 40px 0px rgba(255, 0, 0, 0.1)",
         "card-in": "inset 5px 5px 40px 0px rgba(0, 0, 0, 0.066)",
       },
     },
