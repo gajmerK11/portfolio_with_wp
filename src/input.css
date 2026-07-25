@@ -25,7 +25,8 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-  /* Slim custom scrollbar: grey thumb, pink on hover. */
+  /* Slim custom scrollbar: grey thumb, navy on hover to match the
+     "Work with me" button. */
   ::-webkit-scrollbar {
     width: 10px;
   }
@@ -36,7 +37,7 @@
     background: #c3c3c3;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: theme("colors.accent");
+    background: theme("colors.primary");
   }
 }
 
