@@ -36,7 +36,13 @@ if ( '' === $a['name'] ) {
 // force a full-screen, vertically centred block — with little content the
 // centring left a large empty gap after the Skills section.
 ?>
-<section id="about" data-section="about" class="section relative flex flex-col py-24 px-10 max-w-4xl">
+<?php
+// The width cap sits on an inner wrapper rather than the section, so the
+// mascot strip below can span the full content column — out to the divider
+// line on the left — while the copy stays at a readable measure.
+?>
+<section id="about" data-section="about" class="section relative flex flex-col pt-24 pb-12 px-10">
+	<div class="flex flex-col max-w-4xl">
 
 	<!-- Name + location -->
 	<?php if ( $a['name'] ) : ?>
@@ -61,5 +67,27 @@ if ( '' === $a['name'] ) {
 	<?php if ( $a['desc2'] ) : ?>
 		<p class="text-dark text-[22px] mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc2'] ) ); ?></p>
 	<?php endif; ?>
+
+	</div>
+
+	<?php
+	// Mascot paces the foot of the section. -mx-10 cancels the section padding
+	// so its left edge is the divider line and its right edge the content
+	// edge — those are the two walls it turns around at.
+	?>
+	<div class="-mx-10 mt-24">
+		<?php
+		get_template_part(
+			'template-parts/mascot',
+			null,
+			array(
+				'variant' => 'about',
+				'icon'    => 'dj',
+				'trail'   => true,
+				'setup'   => __( "If you find anything broken, trust me, it's his fault", 'portfolio' ),
+			)
+		);
+		?>
+	</div>
 
 </section>

@@ -856,18 +856,335 @@
   }
 }
 
-/* Subtitle + Learn more rise in after the greeting has typed. */
+/* ---------------------------------------------------------------
+   Site mascot — pixel creature that walks the hero
+--------------------------------------------------------------- */
+/* The strip is the track: it clips the creature at both edges so the walk
+   reads as entering and leaving the page. Decorative, so it never takes
+   pointer events or text selection away from the hero. */
+.mascot {
+  @apply relative w-full h-12 overflow-hidden pointer-events-none select-none;
+  /* Beat between the greeting settling and the creature turning up — the
+     subtitle's rise takes 700ms, so this lands just after it. Inherited by
+     every part below, so the walk, hop, wave and punchline can never drift
+     out of step with each other. */
+  --mascot-delay: 1.2s;
+  /* Gap between one character's bob and the next, i.e. how tight the wave
+     ripples along the phrase. */
+  --mascot-stagger: 30ms;
+}
+/* left + transform together keep the travel relative to the strip rather than
+   the viewport, so it works at any container width: starts fully off the left
+   edge, ends fully off the right.
+
+   translateX(-100%) is only as wide as the visible group because the
+   punchline is taken out of flow (see .mascot-punch). While it still reserved
+   its width here, the walk-in spent its first couple of seconds sliding blank
+   space into view before the creature appeared, which read as a late start
+   rather than an entrance.
+
+   Hidden and unanimated until .pre-typing is dropped: the walk runs exactly
+   once, so it has to start when the page is actually being looked at rather
+   than burning half its run behind the preloader. */
+.mascot-run {
+  @apply absolute bottom-0 flex items-end whitespace-nowrap invisible;
+  color: #d97757;
+}
+/* Creature and line as one unit — takes the border. */
+.mascot-box {
+  @apply inline-flex items-end gap-3;
+}
+/* Creature trails the line it is being blamed in, so the text reads first. */
+.mascot-run--trail .mascot-box {
+  @apply flex-row-reverse;
+}
+/* Wraps the svg so the impact squash stays separate from the walking hop —
+   two transform animations on one element don't compose, the later one just
+   wins. Origin at the feet, so a squash flattens the creature onto the floor
+   rather than shrinking it in place. */
+.mascot-body {
+  @apply inline-flex items-end shrink-0;
+  transform-origin: bottom center;
+}
+.mascot-ico {
+  @apply w-auto h-9 shrink-0;
+}
+/* Regular weight — one step up from the hero greeting's light, which read as
+   too faint at this size. Fira Sans 400 is loaded, so it is a real weight.
+   A touch of tracking: enough to read as pixel-ish lettering, well short of
+   the gap that whitespace between the character spans used to introduce. */
+.mascot-text {
+  @apply relative font-mono text-sm sm:text-base font-normal tracking-wider text-dark pb-1;
+}
+/* Setup walks the whole way; punchline arrives early in the crossing.
+   Positioned out of flow, pinned just past the end of the setup line, so its
+   width never counts toward the group — that is what lets the walk start from
+   just off the left edge instead of a screen-width of blank space. Being out
+   of flow from the first frame also means no layout ever changes mid-walk,
+   which would make the creature jump. */
+.mascot-punch {
+  @apply hidden sm:block absolute left-full top-0 ml-1.5 opacity-0 whitespace-nowrap;
+}
+.mascot-ch {
+  @apply inline-block;
+}
+.mascot-sp {
+  @apply inline-block;
+}
+
+/* --- Triggers -------------------------------------------------------------
+   Each variant waits for its own cue, so the animation rules are written per
+   variant rather than on the shared classes: the hero creature on the typing
+   intro finishing (.pre-typing dropped), the roaming one on .is-walking,
+   which JS adds when Home scrolls out of view. Iteration counts on the hop
+   and wave are sized to each walk so nothing keeps looping on an element
+   that has already left the screen.
+
+   `both` rather than `forwards` on the walk: the backwards half holds the
+   from-state through the delay, so nothing sits parked at the left edge
+   waiting for its cue.
+
+   steps() instead of a smooth ease on the hop: a pixel creature should hop,
+   not glide. */
+html:not(.pre-typing) .mascot--hero .mascot-run {
+  @apply visible;
+  animation: mascot-walk 18s linear var(--mascot-delay) 1 both;
+}
+html:not(.pre-typing) .mascot--hero .mascot-ico {
+  animation: mascot-hop 400ms steps(2, jump-none) var(--mascot-delay) 45;
+}
+html:not(.pre-typing) .mascot--hero .mascot-punch {
+  animation: mascot-punch 18s linear var(--mascot-delay) 1 both;
+}
+html:not(.pre-typing) .mascot--hero .mascot-ch {
+  animation: mascot-wave 820ms ease-in-out 22;
+  /* --i is the character index, so the bob ripples along the phrase. Offset
+     by the shared delay so the wave starts with the walk, not before it. */
+  animation-delay: calc(var(--mascot-delay) + var(--i, 0) * var(--mascot-stagger));
+}
+
+/* --- About variant -------------------------------------------------------
+   Paces back and forth along the foot of the About section instead of
+   crossing once: `alternate` reverses the walk at each end, so it turns
+   around when it reaches an edge rather than looping around. No character
+   wave here — the line is long enough that the pacing alone is the joke.
+
+   Travel is linear, not eased — easing decelerates into the wall, which looks
+   like stopping short of it. Arriving at full speed and squashing the box on
+   contact is what reads as an impact.
+
+   Runs only while the strip is on screen (JS toggles .is-walking), since this
+   animation never ends on its own. Hidden below `sm`, where the ~50 character
+   line is wider than the screen and has nowhere to pace. */
+.mascot--about {
+  /* Height is the box plus a hair — any more and the strip reads as padding
+     added to make room for it rather than as the box sitting there. */
+  @apply hidden sm:block h-9;
+  /* One leg of the pace. Shared so travel, squash and the turn stay locked
+     together — they must reach each wall on the same frame. */
+  --mascot-leg: 8s;
+}
+/* Boxed, so the pair reads as one object hitting the edges. Scaled down from
+   the hero creature's sizing — this one lives beside body copy, where it
+   should register as an aside rather than announce itself. */
+.mascot--about .mascot-box {
+  @apply relative items-center gap-2 rounded-[4px] border border-[#ececec] bg-white px-2.5 py-1;
+}
+.mascot--about .mascot-ico {
+  @apply h-6;
+}
+.mascot--about .mascot-text {
+  @apply text-[11px] sm:text-xs pb-0;
+}
+/* Lightning: a bright arc of the scroll-line gradient (#b8ceff -> #004fff,
+   same as .divider-line) chasing itself around the border.
+
+   Drawn as a ring rather than a real border — the conic gradient fills the
+   whole pseudo-element, and the two-layer mask punches out everything inside
+   the 2px padding, leaving only the frame. Rotating the gradient's own angle
+   keeps the geometry still; rotating the element instead would swing its
+   corners out of the box, since it isn't square.
+
+   Note the arc covers the perimeter at an uneven pace — a conic sweeps its
+   angle evenly, which on a box this wide is far more pixels per degree along
+   the top than down a side. That speeding-up-and-stalling is the intended
+   look here; a constant-speed version was tried and rejected.
+
+   Needs @property for the angle to be animatable at all: Chrome/Edge,
+   Safari 16.4+, Firefox 128+. Older browsers just show the plain border
+   beneath, which is a clean fallback. */
+@property --mascot-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.mascot--about.is-walking .mascot-box::before {
+  content: "";
+  @apply absolute inset-0 pointer-events-none;
+  /* Inherited, so the ring can never drift from the box's own corners. */
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--mascot-angle),
+    transparent 0deg 240deg,
+    #b8ceff 300deg,
+    #004fff 345deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: mascot-arc 2.2s linear infinite;
+}
+.mascot--about.is-walking .mascot-run {
+  @apply visible;
+  animation: mascot-bounce var(--mascot-leg) linear infinite alternate;
+}
+.mascot--about.is-walking .mascot-body {
+  animation: mascot-squash var(--mascot-leg) linear infinite alternate;
+}
+.mascot--about.is-walking .mascot-ico {
+  animation: mascot-hop 320ms steps(2, jump-none) infinite;
+}
+@keyframes mascot-walk {
+  /* Off the left edge, clipped by the strip — no fade needed, it walks in. */
+  from {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  99.9% {
+    visibility: visible;
+  }
+  to {
+    left: 100%;
+    transform: translateX(0);
+    /* Held by the fill mode, so the creature stays gone after its one pass. */
+    visibility: hidden;
+  }
+}
+@keyframes mascot-hop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-4px);
+  }
+}
+/* Edge to edge and no further: at each end the group's own edge is flush with
+   the strip's, so with `alternate` it turns around exactly on contact instead
+   of walking off. */
+@keyframes mascot-bounce {
+  from {
+    left: 0;
+    transform: translateX(0);
+  }
+  to {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}
+/* Squash and stretch on contact. Both ends of the keyframes are a wall — with
+   `alternate`, 100% is the far wall and 0% is the one it came from, which is
+   also where it lands on the way back — so the compressed frame sits at each
+   end and it springs back over the first/last few percent. */
+@keyframes mascot-arc {
+  to {
+    --mascot-angle: 360deg;
+  }
+}
+@keyframes mascot-squash {
+  0% {
+    transform: scaleX(0.76) scaleY(1.14);
+  }
+  6%,
+  94% {
+    transform: scaleX(1) scaleY(1);
+  }
+  100% {
+    transform: scaleX(0.76) scaleY(1.14);
+  }
+}
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+/* Held at 0 just long enough for the creature to clear the left edge and read
+   as walking, then faded in — so the punchline lands early and rides most of
+   the crossing rather than showing up near the exit. */
+@keyframes mascot-punch {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  28%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* A creature crawling across the screen is exactly the kind of motion that
+   causes trouble, so reduced motion parks the hero one still at the left.
+   Selectors are matched to the variant rules above so they out-specify them —
+   plain .mascot-run would lose to html:not(.pre-typing) .mascot--hero. */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.pre-typing) .mascot--hero .mascot-run,
+  html:not(.pre-typing) .mascot--hero .mascot-ico,
+  html:not(.pre-typing) .mascot--hero .mascot-ch,
+  html:not(.pre-typing) .mascot--hero .mascot-punch {
+    animation: none;
+  }
+  html:not(.pre-typing) .mascot--hero .mascot-run {
+    @apply left-0 visible;
+    transform: none;
+  }
+  /* No walk to time the punchline against, so show the whole line at once. */
+  html:not(.pre-typing) .mascot--hero .mascot-punch {
+    @apply opacity-100;
+    transform: none;
+  }
+  /* The pacing one never settles, so there is nothing to park: show it once,
+     still, at the left edge. JS also bails out before adding .is-walking. */
+  .mascot--about .mascot-run,
+  .mascot--about.is-walking .mascot-run,
+  .mascot--about.is-walking .mascot-body,
+  .mascot--about.is-walking .mascot-ico {
+    @apply left-0 visible;
+    animation: none;
+    transform: none;
+  }
+  /* Border streak is motion too — leave the plain border showing. */
+  .mascot--about.is-walking .mascot-box::before {
+    @apply hidden;
+  }
+}
+
+/* Quote block rises in once the greeting has finished typing. Tied to
+   .pre-typing (set in the head, removed by the typing intro) rather than a
+   fixed delay from load, so it still lands after the greeting now that the
+   preloader defers typing by a couple of seconds. */
 .rise-in {
   opacity: 0;
-  animation: rise-up 2s ease-in-out 3s forwards;
+}
+/* No delay: the animation starts the instant .pre-typing is dropped, i.e. the
+   moment the last greeting row finishes typing. */
+html:not(.pre-typing) .rise-in {
+  animation: rise-up 700ms ease-out forwards;
 }
 @keyframes rise-up {
   from {
     opacity: 0;
-    transform: translateY(6vh);
-  }
-  85% {
-    opacity: 0;
+    transform: translateY(28px);
   }
   to {
     opacity: 1;
@@ -875,7 +1192,8 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .rise-in {
+  .rise-in,
+  html:not(.pre-typing) .rise-in {
     opacity: 1;
     animation: none;
   }

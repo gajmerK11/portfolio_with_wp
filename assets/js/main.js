@@ -38,6 +38,7 @@
     setupProjectCarousels();
     setupNavClicks();
     setupContactPanel();
+    setupAboutMascot();
 
     if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
       return;
@@ -138,6 +139,8 @@
     var i = 0;
     function typeRow() {
       if (i >= items.length) {
+        // Normally already done by the last row's transitionend; this covers
+        // rows that had no content to type.
         html.classList.remove("pre-typing");
         unlockWidth();
         return;
@@ -181,6 +184,12 @@
         el.style.whiteSpace = "";
         el.classList.remove("is-typing");
         if (i === items.length - 1) {
+          // Last row is fully revealed: release the gate now rather than on
+          // the next tick, so the quote starts fading in on the final
+          // character instead of after the inter-row pause.
+          html.classList.remove("pre-typing");
+          unlockWidth();
+
           // Keep it inline-block so the blinking caret hugs the text end,
           // then drop the caret after a few seconds.
           el.classList.add("is-cursor");
@@ -200,6 +209,46 @@
     }
 
     typeRow();
+  }
+
+  /**
+   * Let the headphoned mascot pace the foot of the About section while that
+   * strip is on screen.
+   *
+   * The observer only ever switches it on, then disconnects. Toggling the
+   * class off when the strip scrolled away meant every return trip restarted
+   * the CSS animations from their first frame, so the creature snapped back to
+   * the left edge and the border streak jumped. Once started it keeps pacing
+   * for the rest of the session, independent of scrolling.
+   *
+   * Gated on first sight rather than started at load so a visitor who never
+   * reaches About never pays for it.
+   *
+   * No IntersectionObserver (or reduced motion requested) means it simply
+   * never starts, which is the correct outcome either way — it is pure
+   * decoration.
+   */
+  function setupAboutMascot() {
+    var strip = document.querySelector(".mascot--about");
+    if (!strip || !("IntersectionObserver" in window)) {
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        var entry = entries[0];
+        if (!entry || !entry.isIntersecting) {
+          return;
+        }
+        strip.classList.add("is-walking");
+        observer.disconnect();
+      },
+      { threshold: 0 }
+    );
+    observer.observe(strip);
   }
 
   /**

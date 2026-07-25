@@ -3,8 +3,8 @@
  * Home / hero section.
  *
  * Numbered greeting typed in thin Fira Sans over a blurred white backdrop,
- * gradient accent square peeking out top-left, and a soft animated gradient
- * glow at the bottom.
+ * gradient accent square peeking out top-left, a soft animated gradient glow
+ * at the bottom, and the pixel mascot walking across underneath.
  *
  * @package Portfolio
  */
@@ -29,6 +29,27 @@ defined( 'ABSPATH' ) || exit;
 
 		<!-- Subtitle under the card -->
 		<?php echo portfolio_render_fp_subtitle(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
+	</div>
+
+	<?php
+	// Absolutely positioned, not part of the flex flow: a strip in the flow
+	// would add its height to the centred column and push the greeting card
+	// upward. Out of flow, the card keeps the exact position it has without
+	// the mascot, and the creature sits low in the hero on its own.
+	?>
+	<div class="absolute left-0 right-0 bottom-[12%] z-10">
+		<?php
+		get_template_part(
+			'template-parts/mascot',
+			null,
+			array(
+				'variant' => 'hero',
+				'icon'    => 'plain',
+				'setup'   => __( 'I made this site.', 'portfolio' ),
+				'punch'   => __( 'Scroll gently...', 'portfolio' ),
+			)
+		);
+		?>
 	</div>
 
 </section>

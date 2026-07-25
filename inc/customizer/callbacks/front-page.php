@@ -176,9 +176,15 @@ function portfolio_render_fp_greeting() {
 function portfolio_render_fp_subtitle() {
 	$d        = portfolio_fp_greeting_defaults();
 	$subtitle = get_theme_mod( 'portfolio_fp_subtitle', $d['subtitle'] );
-	// Bold 1.5rem with 20px padding — the reference renders this as an <h4>,
-	// which the browser's default stylesheet sets bold.
-	return '<p id="fp-subtitle" class="rise-in font-hero font-bold text-xl sm:text-2xl text-dark p-5 text-center">' . portfolio_kses_greeting( $subtitle ) . '</p>';
+	// Matches the reference's `.s1content h4`: bold 1.5rem (browser default
+	// weight for h4) with 20px padding. It is a grid item in the row under the
+	// card, so it stretches to the card's width and keeps the body's left text
+	// alignment — self-stretch reproduces that inside the hero's centred flex
+	// column, putting the text 20px in from the card's edge rather than
+	// centring it. The reference also carries the UA's 1.33em vertical margin;
+	// dropped here so the line sits tight under the card, on the 20px padding
+	// alone.
+	return '<p id="fp-subtitle" class="rise-in self-stretch font-hero font-bold text-xl sm:text-2xl text-dark p-5 my-0 text-left">' . portfolio_kses_greeting( $subtitle ) . '</p>';
 }
 
 /**
