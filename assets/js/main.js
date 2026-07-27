@@ -535,7 +535,7 @@
 
   /**
    * Every [data-carousel] row — project rows and the testimonials row — is its
-   * own carousel. The < and > arrows slide it one viewport at a time and it
+   * own carousel. The < and > arrows advance it one card per click and it
    * loops endlessly in both directions.
    *
    * The loop is done by appending a second copy of the cards, then silently
@@ -563,9 +563,20 @@
       var looping = false;
       var settle = null;
 
-      /** Width of one copy of the cards. */
+      /**
+       * Distance one copy of the cards covers — i.e. the offset of the first
+       * clone, which includes the gap that follows the last real card. Halving
+       * scrollWidth misses that gap, which left the fold a gap-width off; the
+       * arrows now land on exact card boundaries, so that slop would show as a
+       * short step every time the loop wrapped.
+       */
       function loopWidth() {
-        return looping ? track.scrollWidth / 2 : track.scrollWidth;
+        var clone = looping ? track.querySelector(".is-clone") : null;
+        if (!clone) {
+          return track.scrollWidth;
+        }
+        var origin = track.getBoundingClientRect().left - track.scrollLeft;
+        return Math.round(clone.getBoundingClientRect().left - origin);
       }
 
       /** Jump without animating, whatever scroll-behavior the CSS asks for. */
@@ -639,9 +650,50 @@
         }, 140);
       });
 
+      /**
+       * Scroll offset of every card within the track, ascending.
+       *
+       * Measured off the live boxes rather than derived from a card width plus
+       * a gap: the gap lives in CSS and card widths can differ, so a computed
+       * fixed step would drift out of alignment after a few clicks. Reading the
+       * boxes also keeps this independent of which ancestor each card happens
+       * to be positioned against.
+       */
+      function cardOffsets() {
+        var origin = track.getBoundingClientRect().left - track.scrollLeft;
+        return Array.prototype.map.call(track.children, function (card) {
+          return Math.round(card.getBoundingClientRect().left - origin);
+        });
+      }
+
+      /**
+       * Slide to the next card boundary in `dir` (+1 forward, -1 back) — one
+       * card per click, rather than a whole viewport's worth at a time.
+       */
+      function step(dir) {
+        var offsets = cardOffsets();
+        var at = track.scrollLeft;
+        var target = dir > 0 ? track.scrollWidth : 0;
+
+        for (var i = 0; i < offsets.length; i++) {
+          // A couple of px of slack: a settled smooth scroll rarely lands on
+          // the exact integer offset it was aimed at.
+          if (dir > 0 && offsets[i] > at + 2) {
+            target = offsets[i];
+            break;
+          }
+          // Offsets ascend, so the last one still behind us is the nearest.
+          if (dir < 0 && offsets[i] < at - 2) {
+            target = offsets[i];
+          }
+        }
+
+        track.scrollTo({ left: target, behavior: "smooth" });
+      }
+
       if (next) {
         next.addEventListener("click", function () {
-          track.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+          step(1);
         });
       }
 
@@ -652,7 +704,7 @@
           if (looping && track.scrollLeft <= 4) {
             jumpTo(loopWidth());
           }
-          track.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
+          step(-1);
         });
       }
 
@@ -684,7 +736,24 @@
       var i = 0;
       var dir = 1;
 
+      // Hovering fans the slides out into a grid (CSS), so advancing underneath
+      // it would be invisible churn — and would land on a different slide than
+      // the one the pointer left. Freeze the index while the card is hovered.
+      var paused = false;
+      var card = car.closest(".project-card");
+      if (card) {
+        card.addEventListener("mouseenter", function () {
+          paused = true;
+        });
+        card.addEventListener("mouseleave", function () {
+          paused = false;
+        });
+      }
+
       setInterval(function () {
+        if (paused) {
+          return;
+        }
         i += dir;
         if (i >= slides.length - 1) {
           dir = -1;

@@ -83,15 +83,25 @@ $portfolio_projects = new WP_Query(
 						}
 						$slide_count = count( $slides );
 						?>
-						<article class="project-card <?php echo esc_attr( $p_tint ); ?> snap-start shrink-0 w-[380px] sm:w-[500px] hover:sm:w-[600px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
+						<?php
+						// Fixed height: hovering fans the slides out and grows the footer
+						// type, and the row is a stretch flex container — without a height
+						// the taller card would drag every sibling up with it. The media
+						// area absorbs the difference instead.
+						?>
+						<article class="project-card <?php echo esc_attr( $p_tint ); ?> snap-start shrink-0 w-[380px] sm:w-[500px] h-[520px] sm:h-[580px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
 
 							<!-- Title -->
 							<h3 class="text-[25px] font-light text-dark mb-6"><?php echo esc_html( $p_title ); ?></h3>
 
 							<!-- Media: single image, or a horizontal sliding carousel for 2+ slides -->
-							<div class="flex-1 mb-6 flex items-center">
+							<div class="flex-1 min-h-0 mb-6 flex items-center">
 								<?php if ( $slide_count ) : ?>
-									<div class="project-carousel relative overflow-hidden w-full h-80 sm:h-96" data-slides="<?php echo esc_attr( $slide_count ); ?>">
+									<?php
+									// data-slides drives the JS auto-advance, and CSS reads it too:
+									// a one-slide card is exempt from the hover fan-out.
+									?>
+									<div class="project-carousel relative overflow-hidden w-full h-full" data-slides="<?php echo esc_attr( $slide_count ); ?>">
 										<div class="pc-track flex h-full">
 											<?php foreach ( $slides as $slide ) : ?>
 												<div class="pc-slide">
@@ -120,7 +130,10 @@ $portfolio_projects = new WP_Query(
 															'large',
 															false,
 															array(
-																'class'   => 'max-h-64 w-auto object-contain rounded-lg',
+																// max-w-full matters once hover halves the slide: without
+															// it a wide screenshot keeps its natural width and spills
+															// out past the card edge.
+															'class'   => 'max-h-full max-w-full w-auto object-contain rounded-lg',
 																'loading' => 'lazy',
 																'alt'     => esc_attr( $p_title ),
 															)
@@ -132,7 +145,7 @@ $portfolio_projects = new WP_Query(
 										</div>
 									</div>
 								<?php else : ?>
-									<div class="w-full h-80 sm:h-96 rounded-xl bg-white/60 flex items-center justify-center text-neutral text-sm">
+									<div class="w-full h-full rounded-xl bg-white/60 flex items-center justify-center text-neutral text-sm">
 										<?php esc_html_e( 'No images yet', 'portfolio' ); ?>
 									</div>
 								<?php endif; ?>
@@ -143,12 +156,13 @@ $portfolio_projects = new WP_Query(
 								<?php if ( $p_link ) : ?>
 									<a href="<?php echo esc_url( $p_link ); ?>" target="_blank" rel="noopener noreferrer"
 										class="project-link inline-flex items-center gap-2 text-dark font-normal transition-all">
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+										<?php // Unsized here on purpose — CSS gives it an em width so it grows with the label on hover. ?>
+										<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
 										<?php esc_html_e( 'Link to the platform', 'portfolio' ); ?>
 									</a>
 								<?php endif; ?>
 								<?php if ( '' !== trim( (string) $p_info ) ) : ?>
-									<div class="text-neutral mt-1 leading-snug"><?php echo nl2br( esc_html( $p_info ) ); ?></div>
+									<div class="project-info text-neutral mt-1 leading-snug"><?php echo nl2br( esc_html( $p_info ) ); ?></div>
 								<?php endif; ?>
 							</div>
 						</article>
