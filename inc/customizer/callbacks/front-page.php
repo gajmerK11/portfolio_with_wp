@@ -151,15 +151,18 @@ function portfolio_render_fp_greeting() {
 	// its Fira Sans never loads, so it falls back to Arial, which has no Light
 	// and renders at 400. Matching the number would look markedly thinner.
 	?>
-	<div id="fp-greeting" class="font-hero font-thin text-dark text-3xl sm:text-5xl lg:text-[3.8rem] leading-[2.8rem] sm:leading-[3.6rem] lg:leading-[5rem]">
+	<div id="fp-greeting" class="hero-greeting font-hero font-thin text-dark">
 		<?php
 		foreach ( $lines as $idx => $line ) :
 			// Indent continuation lines (03 onward) so they align under the
-			// text of line 02 rather than under its opening bracket.
-			$indent = ( $idx >= 2 ) ? ' ml-[1.8rem]' : '';
+			// text of line 02 rather than under its opening bracket. Scaled down
+			// In em below the nav breakpoint so it keeps the same proportion as
+			// the 1.8rem-against-3rem it has as a column; a fixed rem indent
+			// would eat most of the width the row has left on a phone.
+			$indent = ( $idx >= 2 ) ? ' ml-[0.6em] nav:ml-[1.8rem]' : '';
 			?>
 			<div class="flex items-center">
-				<span class="text-neutral text-2xl font-thin mr-5"><?php echo esc_html( str_pad( $idx + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
+				<span class="hero-num"><?php echo esc_html( str_pad( $idx + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
 				<div class="type-line font-normal whitespace-nowrap pr-[10px]<?php echo esc_attr( $indent ); ?>"><?php echo portfolio_fp_expand_icons( portfolio_kses_greeting( $line ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses-sanitized, then theme-owned SVG spliced in. ?></div>
 			</div>
 		<?php endforeach; ?>
@@ -184,7 +187,7 @@ function portfolio_render_fp_subtitle() {
 	// centring it. The reference also carries the UA's 1.33em vertical margin;
 	// dropped here so the line sits tight under the card, on the 20px padding
 	// alone.
-	return '<p id="fp-subtitle" class="rise-in self-stretch font-hero font-bold text-xl sm:text-2xl text-dark p-5 my-0 text-left">' . portfolio_kses_greeting( $subtitle ) . '</p>';
+	return '<p id="fp-subtitle" class="hero-subtitle rise-in self-stretch font-hero font-bold text-sm sm:text-xl nav:text-2xl text-dark p-3 sm:p-5 my-0 text-left">' . portfolio_kses_greeting( $subtitle ) . '</p>';
 }
 
 /**

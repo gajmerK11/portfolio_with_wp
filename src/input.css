@@ -58,20 +58,86 @@
     @apply grayscale-0;
   }
 
+  /* Sidebar shell — two distinct layouts, both defined here rather than as
+     utilities on the element, so neither can half-override the other.
+
+     Up to and including a 768px tablet it follows the reference
+     (style2.css:1932-1959): the full-height white column gives way to a
+     floating glass pill pinned to the right edge, with the profile photo and
+     social links dropped and the labels clipped, so only the nav icons remain.
+     From the `nav` screen (769px) up it is the original white column.
+
+     z-[58] clears the content sections (z-50) and the scroll divider (z-55)
+     that the pill now floats over, while staying under the "Work with me"
+     button (z-60). The column only ever sits beside the content, so it goes
+     back to z-30 there. */
+  .site-sidebar {
+    @apply fixed right-3 z-[58] flex flex-col items-center gap-1 rounded-2xl px-1.5 py-2 sm:px-2 sm:py-3;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.44);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    -webkit-backdrop-filter: blur(5.2px);
+    backdrop-filter: blur(5.2px);
+  }
+  .site-sidebar .sidebar-profile {
+    @apply hidden nav:block relative w-profile h-profile;
+  }
+  .site-sidebar .sidebar-nav {
+    @apply flex flex-col items-center gap-1 nav:items-start nav:gap-5 text-xl font-normal;
+  }
+  .site-sidebar .sidebar-social {
+    @apply hidden nav:flex items-center justify-center gap-6 text-dark;
+  }
+  /* Drag handle for the floating bar (assets/js/main.js -> setupSidebarDrag).
+     touch-action:none is load-bearing: without it a touch drag scrolls the page
+     instead of moving the bar. Colour is the reference's own (img/drag.svg). */
+  /* nav:hidden belongs here, not on the element: this selector is two classes
+     deep and would out-specify a utility sitting in the markup. */
+  .site-sidebar .sidebar-drag {
+    @apply mt-0.5 flex nav:hidden items-center justify-center p-1.5 bg-transparent border-0 cursor-grab;
+    color: #b6774a;
+    touch-action: none;
+  }
+  .site-sidebar .sidebar-drag svg {
+    @apply w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none;
+  }
+  .site-sidebar.is-dragging .sidebar-drag {
+    @apply cursor-grabbing;
+  }
+  @screen nav {
+    .site-sidebar {
+      @apply w-sidebar min-h-screen left-0 right-auto bottom-0 justify-between gap-0 rounded-none px-8 py-14 z-30 bg-white;
+      top: 0;
+      transform: none;
+      border: 0;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
   /* Sidebar nav item. Active state toggled by JS on scroll.
-     Default black; navy on hover/selected. Selected icon enlarges. */
+     Default black; navy on hover/selected. The selected icon enlarges at every
+     width: 1.45x of a 24px icon is 35px, which still clears the 40px tap target
+     it sits in, so the pill has room for it. */
   .nav-item {
-    @apply flex items-center gap-4 text-dark transition-colors hover:text-primary bg-transparent border-0 p-0 m-0 cursor-pointer text-left;
+    @apply flex items-center gap-4 p-2 nav:p-0 m-0 text-dark transition-colors hover:text-primary bg-transparent border-0 cursor-pointer text-left;
     font: inherit;
   }
+  /* Steps down as the bar gets smaller: 24px on phones, 28px on large phones
+     and small tablets, the full 36px once it is a column again. */
   .nav-item .nav-icon {
-    @apply w-9 h-9 shrink-0 origin-center;
+    @apply w-6 h-6 sm:w-7 sm:h-7 nav:w-9 nav:h-9 shrink-0 origin-center;
     transition:
       color 200ms ease,
       transform 250ms ease;
   }
+  /* Clipped rather than display:none in the bar, so each icon-only button keeps
+     an accessible name. sr-only is out of flow, so it costs no layout either. */
   .nav-item .nav-label {
-    @apply px-4 py-2 rounded-[5px] border-l-2 border-transparent transition-all text-left whitespace-nowrap;
+    @apply sr-only nav:not-sr-only nav:px-4 nav:py-2 nav:rounded-[5px] nav:border-l-2 nav:border-transparent nav:transition-all nav:text-left nav:whitespace-nowrap;
   }
   .nav-item.is-active {
     @apply text-primary;
@@ -80,7 +146,7 @@
     transform: scale(1.45);
   }
   .nav-item.is-active .nav-label {
-    @apply bg-paper border-primary;
+    @apply nav:bg-paper nav:border-primary;
   }
   @media (prefers-reduced-motion: reduce) {
     .nav-item .nav-icon {
@@ -88,18 +154,18 @@
     }
   }
 
-  /* Fixed "Work with me" pill (top-right). The arrow is assets/img/aright.svg
-     scaled to 300px and pulled left so only its head shows; the button clips
-     the overflow. On hover the shaft slides back in and draws itself across
-     the full width of the button, between the two lines of the label. */
+  /* Fixed "Work with me" pill. Top-right as a column; below the nav breakpoint
+     the reference moves it to the bottom-right (style2.css:1967) and shrinks the
+     label (style2.css:2166, 22px — with a 20px radius at :2233). Bottom-right
+     also keeps it off the greeting card, which is centred in the hero. */
   .work-btn {
-    @apply fixed top-[5%] right-[5%] z-[60] flex items-center bg-primary hover:bg-accent-dark rounded-[5px] px-[25px] py-[5px] overflow-hidden cursor-pointer transition-all duration-200;
+    @apply fixed bottom-[5%] right-[5%] nav:bottom-auto nav:top-[5%] z-[60] flex items-center bg-primary hover:bg-accent-dark rounded-[10px] nav:rounded-[5px] px-4 py-1 nav:px-[25px] nav:py-[5px] overflow-hidden cursor-pointer transition-all duration-200;
   }
   /* Sora, as the reference reports for this button. 24px on a 150% line box
      gives the 72px content height in its computed box (159.34 x 82 overall
      with 5px/25px padding). */
   .work-btn h4 {
-    @apply font-sans text-white font-bold text-2xl leading-[150%] m-0;
+    @apply font-sans text-white font-bold text-base sm:text-lg nav:text-2xl leading-[150%] m-0;
   }
   /* The arrow overlays the label rather than sitting in the flex flow, so it
      spans the whole button and crosses between the two lines of text. It is
@@ -109,27 +175,41 @@
   .work-btn .work-arrow {
     @apply absolute left-0 right-0 top-1/2 -translate-y-1/2 flex justify-end overflow-hidden pointer-events-none;
   }
+  /* The right margin has to track the button's own horizontal padding, or the
+     arrow head stops short of / runs past the edge. */
   .work-btn .work-arrow img {
     width: 240px;
     min-width: 240px;
     max-width: none;
-    margin-right: 25px;
+    margin-right: 16px;
     transition: margin-right 250ms ease-in-out;
   }
   .work-btn:hover .work-arrow img {
     margin-right: 0;
+  }
+  @screen nav {
+    .work-btn .work-arrow img {
+      margin-right: 25px;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .work-btn .work-arrow img {
       transition: none;
     }
   }
-  /* Grows + drifts inward when the About section is on screen. */
+  /* Grows + drifts inward when the About section is on screen. Anchored to the
+     bottom it only grows — the reference's move to top:40% would drop it
+     straight onto the floating nav bar, which owns that slot. */
   .work-btn.is-grown {
-    top: 40%;
-    right: 10%;
-    scale: 1.3;
+    scale: 1.15;
     transition: 300ms ease-in-out;
+  }
+  @screen nav {
+    .work-btn.is-grown {
+      top: 40%;
+      right: 10%;
+      scale: 1.3;
+    }
   }
 
   /* "Download CV" tab pinned to the right edge, laid out like the awwwards
@@ -139,19 +219,37 @@
      hoverable there. The projects and testimonials sections are lifted to
      z-50, so their cards scroll over the top of it — the same layering the
      reference gives its awwwards badge. "Work with me" is z-[60], above both. */
+  /* While the nav is a floating pill it takes the right-centre slot, so this tab
+     sits top-left instead: the left edge is the one the sidebar column vacated,
+     and 5% down matches the "Work with me" button opposite it, so the two read
+     as a pair across the top. As a column it goes back to being centred on the
+     right. It tucks towards whichever edge it is pinned to.
+
+     The vertical offset is a raw transform rather than Tailwind's
+     -translate-y-1/2: the tuck animates transform too, so both states have to
+     be written in the same place or one silently drops the other's half. */
   .download-cv {
-    @apply fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-badge text-white flex flex-col items-center justify-between py-4 w-[53px] h-[171px];
+    @apply fixed left-0 right-auto top-[5%] nav:left-auto nav:right-0 nav:top-1/2 z-40 bg-badge text-white flex flex-col items-center justify-between py-4 w-[53px] h-[171px];
+    transform: none;
     transition:
       opacity 300ms ease-in-out,
       transform 300ms ease-in-out;
   }
-  /* Past the hero: slid out to the right and switched off. The sections below
-     are transparent, so hiding it outright is the only way it stays out of
-     the way — z-index alone lets it show through the gaps between cards. */
+  /* Past the hero: slid out sideways and switched off. The sections below are
+     transparent, so hiding it outright is the only way it stays out of the
+     way — z-index alone lets it show through the gaps between cards. */
   .download-cv.is-tucked {
     opacity: 0;
     pointer-events: none;
-    transform: translate(100%, -50%);
+    transform: translateX(-100%);
+  }
+  @screen nav {
+    .download-cv {
+      transform: translateY(-50%);
+    }
+    .download-cv.is-tucked {
+      transform: translate(100%, -50%);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .download-cv {
@@ -181,8 +279,10 @@
 
   /* Floating WhatsApp — matches reference .cookie-manager-btn size/position
      (30×30 icon, fixed bottom:20px right:20px). */
+  /* Bottom-left below the nav breakpoint: the "Work with me" pill takes the
+     bottom-right corner there, and the two would sit on top of each other. */
   .whatsapp-btn {
-    @apply fixed bottom-5 right-5 z-[70] flex items-center justify-center px-[15px] py-[10px] bg-transparent border-0 no-underline transition-transform duration-150;
+    @apply fixed bottom-5 left-2 right-auto nav:left-auto nav:right-5 z-[70] flex items-center justify-center px-[15px] py-[10px] bg-transparent border-0 no-underline transition-transform duration-150;
   }
   .whatsapp-btn svg {
     @apply w-[30px] h-[30px] block;
@@ -535,7 +635,146 @@
   /* Hero greeting card: no border — a blurred white backdrop floats the
      text above the animated gradient, navy square peeks out top-left. */
   .hero-card {
-    @apply relative rounded-[5px] p-[30px];
+    @apply relative rounded-[5px] p-3 sm:p-5 nav:p-[30px];
+  }
+  /* Profile as a full-bleed backdrop across the top of the hero, shown only
+     while the sidebar is a floating pill — the pill has no room for a photo, so
+     the hero carries its own copy (as the reference does: a second #imgprofil
+     inside section.sec1, index.html:188).
+
+     Borrowed from the way a film page mounts its backdrop: the image runs the
+     full width, is anchored to the top, and dissolves into the page instead of
+     ending on an edge, with the content sitting over the tail of that fade.
+     What is deliberately not borrowed is the treatment — no darkening, no
+     overlay, no tint. This page is white and stays white; the fade alone does
+     the blending, so the greeting card still lands on plain white and the
+     section reads as one surface rather than a photo with a page under it.
+
+     Sized in vh/px rather than the em root below, because it must also hold at
+     640-768px, where the bar is still a pill but that block no longer applies. */
+  .hero-profile {
+    @apply absolute left-0 right-0 top-0 mx-auto z-0 nav:hidden pointer-events-none;
+    /* Under object-fit: cover the slice of the photo on show is decided by the
+       box's aspect ratio alone — nothing else — so the ratio is pinned here and
+       the same portion appears at every width. Sizing by height instead (vh, or
+       a vw with a vh cap) let the ratio drift as the screen widened, which is
+       what tightened the crop: ~92% of the photo's height at 320px against
+       ~38% at 768px.
+       Width is then capped rather than the height, because at a fixed ratio the
+       two are the same dial: full-bleed at 768px would make the band 707px tall
+       and run it straight through the greeting. Capped, it stays a centred band
+       that clears the copy — and the side fades mean it dissolves rather than
+       cutting off against the white. */
+    width: 100%;
+    max-width: 27rem;
+    aspect-ratio: 100 / 92;
+    /* Carries the image down into the page. The stop is well short of 100%, so
+       the band is already faint by the time the greeting card reaches it. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
+  }
+  /* The shared partial renders an avatar — circular, white ring, drop shadow.
+     None of that applies to a backdrop. Element selector included so this
+     outranks the utilities the partial carries.
+
+     It also takes the side fades. Splitting the two axes across parent and
+     child keeps each to a single-layer mask: two layers on one element need
+     mask-composite, and autoprefixer's legacy -webkit- translation of
+     `intersect` puts `xor` on the second layer, which excludes instead of
+     intersecting and inverts the fade in WebKit. Nested masks just compose. */
+  .hero-profile > div {
+    @apply rounded-none border-0 shadow-none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  }
+  /* Framed off the top third: the subject of a portrait sits above centre, and
+     a plain centre crop on a landscape band cuts the head off. */
+  .hero-profile img {
+    object-position: center 28%;
+  }
+  /* Greeting type scale.
+     The rows are nowrap and must stay that way: the typing reveal animates a
+     width from 0, so a row that could reflow would rewrap mid-animation. That
+     means the type has to shrink to fit a narrow screen rather than wrap onto a
+     second line — the reference does the same thing (style2.css:2297, 1.2rem
+     with -.7px tracking at <=600px), it just lets the overflow spill.
+
+     Below sm the size is therefore computed from the width actually left for
+     the text — the viewport less the section padding, the card padding and the
+     line-number gutter — over the em-width of the longest row. 13 is that
+     width for the stock copy with a little slack for the inline icons; much
+     longer copy entered in the Customizer would still need the divisor raised.
+     Clamped so it stays readable on a 320px phone and never overshoots the
+     fixed step it replaces. */
+  .hero-greeting {
+    @apply text-3xl sm:text-4xl nav:text-5xl lg:text-[3.8rem];
+    @apply leading-[2.4rem] sm:leading-[2.8rem] nav:leading-[3.6rem] lg:leading-[5rem];
+  }
+  /* Below sm the hero is scaled from a single fluid root on .hero-stack and
+     every part inside is expressed in em, so the card, the rows, the line
+     numbers, the inline icons, the accent square and the subtitle all shrink by
+     the same factor. Sizing them independently is what made the block look
+     cramped rather than smaller: a fixed 1.2rem icon next to 13.6px type is
+     larger than the text it sits in, and a fixed -5px pull is a third of an em
+     at that size, which is what jammed the icon into the word before it.
+
+     The root is the width actually left for the card — the viewport less the
+     section's padding — over the card's own width in em: ~12.3em for the longest
+     row of the stock copy, 1.17em for the number and its gutter, 1.4em for the
+     card's padding, then rounded up to 16.6 so the card lands at about 94% of
+     the space rather than exactly filling it. That slack matters: the em figures
+     are measured off the current copy, and with none of it a slightly wider
+     glyph run would spill straight into the section's overflow clip. Clamped so
+     it stays legible on a narrow phone and never overshoots the fixed step it
+     replaces. */
+  @media (max-width: 639.98px) {
+    .hero-stack {
+      font-size: clamp(0.8rem, calc((100vw - 5.375rem) / 16.6), 1.875rem);
+    }
+    .hero-stack .hero-card {
+      padding: 0.7em;
+    }
+    .hero-stack .hero-greeting {
+      font-size: 1em;
+      /* 1.65 is the reference's own mobile ratio: line-height 200% of a 16px
+         parent against a 1.2rem row (style2.css:2261, :2297). */
+      line-height: 1.65;
+      letter-spacing: -0.02em;
+    }
+    .hero-stack .hero-num {
+      font-size: 0.72em;
+      margin-right: 0.45em;
+    }
+    /* Three classes deep on purpose: .hero-card .hero-ico is declared after
+       this block at the same specificity and would otherwise win. */
+    .hero-stack .hero-card .hero-ico {
+      height: 0.95em;
+      margin-left: -0.08em;
+      margin-right: 0.16em;
+    }
+    /* Reaches exactly to the card's padding edge (1.4 - 0.7 = 0.7em), so it can
+       never sit behind the first line number. The 0.7em overhang is also what
+       has to fit to its left: the card is ~96% of the section's content box
+       here, so it only leaves a few px of centring margin, and the section's
+       own left padding covers the rest. A larger overhang goes negative and the
+       section's overflow clip cuts the square flat against the viewport edge. */
+    .hero-stack .hero-square {
+      width: 1.4em;
+      height: 1.4em;
+      top: -0.7em;
+      left: -0.7em;
+    }
+    /* nowrap and sized to stay inside the card, so it reads as one line rather
+       than breaking mid-phrase on a narrow screen. */
+    .hero-stack .hero-subtitle {
+      font-size: 0.68em;
+      padding: 0.7em;
+      white-space: nowrap;
+    }
+  }
+  /* Line numbers: shrink with the type and keep their gutter proportional. */
+  .hero-num {
+    @apply shrink-0 text-neutral font-thin text-sm sm:text-lg nav:text-2xl mr-2 sm:mr-3 nav:mr-5;
   }
   /* Inline icon inside a greeting line. Reference sizing: 1.2rem tall,
      pulled 5px back towards the word it belongs to. */

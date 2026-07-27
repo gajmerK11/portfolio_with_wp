@@ -5,6 +5,15 @@ module.exports = {
   safelist: ["text-primary", "text-neutral"],
   theme: {
     extend: {
+      // The sidebar switches from its floating glass bar to the full column one
+      // pixel above Tailwind's md, so that a 768px tablet still gets the bar.
+      // Everything tied to that switch uses this screen and never md: the bar
+      // itself, the nav items, the Download CV tab, and — in header.php — the
+      // divider line and the content's left offset. They must move together or
+      // the content indents for a sidebar that is not there.
+      screens: {
+        nav: "769px",
+      },
       colors: {
         primary: "#020073", // deep navy — headline accents, progress line
         accent: "#e94ad9", // pink — buttons, links, active nav

@@ -37,6 +37,7 @@
     setupProjectsScroll();
     setupProjectCarousels();
     setupNavClicks();
+    setupSidebarDrag();
     setupContactPanel();
     setupAboutMascot();
 
@@ -710,6 +711,152 @@
 
       refresh();
       window.addEventListener("resize", refresh);
+    });
+  }
+
+  /**
+   * Let the floating nav bar be dragged clear of whatever it is covering on
+   * small screens. The reference does this with GSAP Draggable
+   * (index.html:1186); Pointer Events cover it without the extra dependency,
+   * and the reference's `inertia: true` needs a paid GSAP plugin anyway.
+   *
+   * CSS centres the bar with `top: 50%` plus a `translateY(-50%)`, which a drag
+   * cannot build on — moving it would fight the centring transform. So the
+   * first drag freezes the bar into plain left/top pixels read off its current
+   * box and drops the transform; from then on the drag only moves those. The
+   * inline styles are cleared again if the viewport grows into the column
+   * layout, handing position back to CSS.
+   *
+   * Only the handle drags, never the bar itself, so a tap on a nav icon still
+   * navigates.
+   */
+  function setupSidebarDrag() {
+    var bar = document.querySelector(".site-sidebar");
+    var handle = bar && bar.querySelector("[data-sidebar-drag]");
+    if (!handle || !window.PointerEvent) {
+      return;
+    }
+
+    // Must match the `nav` screen in tailwind.config.js — the width the bar's
+    // two layouts switch at. A 768px tablet still gets the floating bar.
+    var column = window.matchMedia("(min-width: 769px)");
+    var EDGE = 8;
+    var STEP = 16;
+    var placed = false;
+    var startX = 0;
+    var startY = 0;
+    var originX = 0;
+    var originY = 0;
+
+    /** Freeze the CSS-centred bar into absolute pixels a drag can move. */
+    function place() {
+      // Measured before the transform is dropped, so the bar does not shift.
+      var rect = bar.getBoundingClientRect();
+      bar.style.transform = "none";
+      bar.style.right = "auto";
+      bar.style.bottom = "auto";
+      bar.style.left = rect.left + "px";
+      bar.style.top = rect.top + "px";
+      placed = true;
+    }
+
+    /** Hand positioning back to CSS. */
+    function release() {
+      bar.style.transform = "";
+      bar.style.right = "";
+      bar.style.bottom = "";
+      bar.style.left = "";
+      bar.style.top = "";
+      placed = false;
+    }
+
+    /** Move to left/top, kept fully on screen. */
+    function moveTo(left, top) {
+      var rect = bar.getBoundingClientRect();
+      var maxLeft = Math.max(EDGE, window.innerWidth - rect.width - EDGE);
+      var maxTop = Math.max(EDGE, window.innerHeight - rect.height - EDGE);
+      bar.style.left = Math.max(EDGE, Math.min(left, maxLeft)) + "px";
+      bar.style.top = Math.max(EDGE, Math.min(top, maxTop)) + "px";
+    }
+
+    function currentLeft() {
+      return parseFloat(bar.style.left) || 0;
+    }
+
+    function currentTop() {
+      return parseFloat(bar.style.top) || 0;
+    }
+
+    handle.addEventListener("pointerdown", function (event) {
+      if (column.matches) {
+        return;
+      }
+      if (!placed) {
+        place();
+      }
+      startX = event.clientX;
+      startY = event.clientY;
+      originX = currentLeft();
+      originY = currentTop();
+      bar.classList.add("is-dragging");
+      // Capture keeps the moves coming even when the pointer outruns the
+      // handle, which it will — the handle is only a few px across.
+      handle.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+
+    handle.addEventListener("pointermove", function (event) {
+      if (!bar.classList.contains("is-dragging")) {
+        return;
+      }
+      moveTo(
+        originX + (event.clientX - startX),
+        originY + (event.clientY - startY)
+      );
+    });
+
+    function stop() {
+      bar.classList.remove("is-dragging");
+    }
+    handle.addEventListener("pointerup", stop);
+    handle.addEventListener("pointercancel", stop);
+
+    // Arrow keys nudge it too, so the handle is not a pointer-only control.
+    handle.addEventListener("keydown", function (event) {
+      var dx = 0;
+      var dy = 0;
+      if ("ArrowLeft" === event.key) {
+        dx = -1;
+      } else if ("ArrowRight" === event.key) {
+        dx = 1;
+      } else if ("ArrowUp" === event.key) {
+        dy = -1;
+      } else if ("ArrowDown" === event.key) {
+        dy = 1;
+      } else {
+        return;
+      }
+      if (column.matches) {
+        return;
+      }
+      if (!placed) {
+        place();
+      }
+      moveTo(currentLeft() + dx * STEP, currentTop() + dy * STEP);
+      event.preventDefault();
+    });
+
+    // A bar left near an edge must not end up off screen when the window
+    // changes, nor stay pinned in pixels once it is a column again.
+    window.addEventListener("resize", function () {
+      if (!placed) {
+        return;
+      }
+      if (column.matches) {
+        release();
+        return;
+      }
+      moveTo(currentLeft(), currentTop());
     });
   }
 

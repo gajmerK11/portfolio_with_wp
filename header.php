@@ -45,7 +45,7 @@ defined( 'ABSPATH' ) || exit;
 </div>
 <noscript><style>#site-preloader{display:none !important;}</style></noscript>
 
-<div class="relative w-full min-h-screen md:flex">
+<div class="relative w-full min-h-screen nav:flex">
 
 	<?php get_template_part( 'template-parts/sidebar' ); ?>
 
@@ -53,8 +53,8 @@ defined( 'ABSPATH' ) || exit;
 	// Scroll progress line at the sidebar/content divider: a light grey
 	// track with a navy bar that grows with scroll (via JS).
 	?>
-	<span class="divider-track hidden md:block fixed top-0 left-sidebar h-screen w-[2px] z-[55] pointer-events-none" aria-hidden="true"></span>
-	<span id="divider-line" class="divider-line hidden md:block fixed top-0 left-sidebar h-screen w-[2px] origin-top scale-y-0 z-[55] pointer-events-none" aria-hidden="true"></span>
+	<span class="divider-track hidden nav:block fixed top-0 left-sidebar h-screen w-[2px] z-[55] pointer-events-none" aria-hidden="true"></span>
+	<span id="divider-line" class="divider-line hidden nav:block fixed top-0 left-sidebar h-screen w-[2px] origin-top scale-y-0 z-[55] pointer-events-none" aria-hidden="true"></span>
 
 	<!-- Fixed top-right CTA — opens the slide-in contact panel -->
 	<a class="work-btn group" href="#contact" data-contact-open aria-haspopup="dialog">
@@ -88,4 +88,4 @@ defined( 'ABSPATH' ) || exit;
 		</svg>
 	</a>
 
-	<main id="content" class="flex-1 md:ml-sidebar min-w-0">
+	<main id="content" class="flex-1 nav:ml-sidebar min-w-0">
