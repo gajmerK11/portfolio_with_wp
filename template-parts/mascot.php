@@ -23,9 +23,7 @@
  * measured against the group's own width, so keeping the punchline out of that
  * width is what lets the creature start just off the left edge rather than a
  * screenful of blank space away. It fades, never toggles display — a layout
- * change mid-walk would make the creature jump. Below `sm` it is hidden
- * outright, where the full phrase is nearly as wide as the strip and would
- * never clear the right edge.
+ * change mid-walk would make the creature jump.
  *
  * Pure decoration, so it is pointer-transparent and unselectable — it must
  * never sit between the visitor and the greeting or the CTA. The label is

@@ -29,11 +29,17 @@ $portfolio_projects = new WP_Query(
 // the cards scroll over it instead of under it. The hero is left unlifted, so
 // the tab stays on top — and hoverable — there.
 ?>
-<section id="projects" data-section="projects" class="section relative z-50 min-h-screen flex flex-col justify-center p-10 overflow-hidden">
+<section id="projects" data-section="projects" class="section relative z-50 min-h-screen flex flex-col justify-center px-4 py-10 sm:p-10 overflow-hidden">
 
-	<!-- Heading -->
-	<div class="flex items-center justify-between mb-10">
-		<h2 class="text-[42px] font-semibold text-dark flex items-center gap-3">
+	<?php
+	// nowrap plus a fluid size rather than a fixed one: at 42px the heading
+	// broke onto a second line on every phone, and a heading that reflows mid-
+	// phrase reads as two headings. The floor keeps it legible at 320px, where
+	// 6vw would otherwise put it under 20px; the ceiling is the desktop size it
+	// has always been.
+	?>
+	<div class="flex items-center justify-between mb-6 sm:mb-10">
+		<h2 class="text-[clamp(1.2rem,6vw,42px)] font-semibold text-dark flex items-center gap-2 sm:gap-3 whitespace-nowrap">
 			<?php esc_html_e( 'My best projects', 'portfolio' ); ?>
 			<span class="text-primary">&#10022;</span>
 		</h2>
@@ -88,11 +94,18 @@ $portfolio_projects = new WP_Query(
 						// type, and the row is a stretch flex container — without a height
 						// the taller card would drag every sibling up with it. The media
 						// area absorbs the difference instead.
+						//
+						// The width is the design's 380px until the viewport cannot hold
+						// it, then the viewport less the section's own padding. A flat
+						// 380px is what clipped the footer text on a 320px phone: the card
+						// was wider than the column it sat in, so its right-hand side —
+						// the end of every line in the link and the description — was
+						// simply outside the scroller's visible area.
 						?>
-						<article class="project-card <?php echo esc_attr( $p_tint ); ?> snap-start shrink-0 w-[380px] sm:w-[500px] h-[520px] sm:h-[580px] rounded-[5px] p-8 flex flex-col transition-all duration-200">
+						<article class="project-card <?php echo esc_attr( $p_tint ); ?> snap-start shrink-0 w-[min(380px,calc(100vw-2rem))] sm:w-[500px] h-[520px] sm:h-[580px] rounded-[5px] p-5 sm:p-8 flex flex-col transition-all duration-200">
 
 							<!-- Title -->
-							<h3 class="text-[25px] font-light text-dark mb-6"><?php echo esc_html( $p_title ); ?></h3>
+							<h3 class="text-[21px] sm:text-[25px] font-light text-dark mb-4 sm:mb-6"><?php echo esc_html( $p_title ); ?></h3>
 
 							<!-- Media: single image, or a horizontal sliding carousel for 2+ slides -->
 							<div class="flex-1 min-h-0 mb-6 flex items-center">

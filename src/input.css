@@ -14,6 +14,25 @@
   :root {
     --sidebar-w: clamp(20rem, calc((100vw / 12) * 2.5), 26rem);
     --profile-size: clamp(11rem, calc((100vw / 12) * 1.5), 15rem);
+    /* The floating nav pill scales from one dial, below the nav breakpoint.
+       Everything in the bar is a multiple of the icon — the button padding, the
+       bar's own padding, the gaps, the drag handle — so it grows as one object
+       with the screen instead of stepping between two fixed sizes and looking
+       oversized on a 320px phone.
+
+       --pill-w is that geometry resolved: icon plus both button paddings plus
+       both bar paddings. The hero reads it too, because the bar floats over the
+       hero and the section's right padding is what keeps the greeting out from
+       under it — a padding that did not track the bar's width would either let
+       them collide or waste the room, which is what the old fixed 70px did on a
+       320px screen against a 52px bar.
+
+       The ceiling is set so the bar arrives at roughly its previous size at the
+       top of the phone range rather than overshooting it: unclamped, 5.2vw
+       passes the old fixed size around 470px and the bar would end up larger
+       than the one being replaced. */
+    --pill-ico: clamp(1.05rem, 5.2vw, 1.4rem);
+    --pill-w: calc(var(--pill-ico) * 2.36);
   }
   html {
     scroll-behavior: smooth;
@@ -72,7 +91,12 @@
      button (z-60). The column only ever sits beside the content, so it goes
      back to z-30 there. */
   .site-sidebar {
-    @apply fixed right-3 z-[58] flex flex-col items-center gap-1 rounded-2xl px-1.5 py-2 sm:px-2 sm:py-3;
+    @apply fixed right-3 z-[58] flex flex-col items-center rounded-2xl;
+    /* Both in the icon's own terms — see --pill-ico. Fixed px here is what made
+       the bar look heavy on a small phone: the padding and gaps stayed put while
+       the icons shrank, so the chrome grew as a share of the whole. */
+    padding: calc(var(--pill-ico) * 0.28);
+    gap: calc(var(--pill-ico) * 0.18);
     top: 50%;
     transform: translateY(-50%);
     background: rgba(255, 255, 255, 0.76);
@@ -85,7 +109,8 @@
     @apply hidden nav:block relative w-profile h-profile;
   }
   .site-sidebar .sidebar-nav {
-    @apply flex flex-col items-center gap-1 nav:items-start nav:gap-5 text-xl font-normal;
+    @apply flex flex-col items-center nav:items-start text-xl font-normal;
+    gap: calc(var(--pill-ico) * 0.18);
   }
   .site-sidebar .sidebar-social {
     @apply hidden nav:flex items-center justify-center gap-6 text-dark;
@@ -96,12 +121,15 @@
   /* nav:hidden belongs here, not on the element: this selector is two classes
      deep and would out-specify a utility sitting in the markup. */
   .site-sidebar .sidebar-drag {
-    @apply mt-0.5 flex nav:hidden items-center justify-center p-1.5 bg-transparent border-0 cursor-grab;
+    @apply flex nav:hidden items-center justify-center bg-transparent border-0 cursor-grab;
+    padding: calc(var(--pill-ico) * 0.3);
     color: #b6774a;
     touch-action: none;
   }
   .site-sidebar .sidebar-drag svg {
-    @apply w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none;
+    @apply pointer-events-none;
+    width: calc(var(--pill-ico) * 0.62);
+    height: calc(var(--pill-ico) * 0.62);
   }
   .site-sidebar.is-dragging .sidebar-drag {
     @apply cursor-grabbing;
@@ -116,6 +144,9 @@
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
     }
+    .site-sidebar .sidebar-nav {
+      @apply gap-5;
+    }
   }
 
   /* Sidebar nav item. Active state toggled by JS on scroll.
@@ -123,16 +154,34 @@
      width: 1.45x of a 24px icon is 35px, which still clears the 40px tap target
      it sits in, so the pill has room for it. */
   .nav-item {
-    @apply flex items-center gap-4 p-2 nav:p-0 m-0 text-dark transition-colors hover:text-primary bg-transparent border-0 cursor-pointer text-left;
+    @apply flex items-center gap-4 m-0 text-dark transition-colors hover:text-primary bg-transparent border-0 cursor-pointer text-left;
+    /* 0.4 of the icon each side, which holds the button at 1.8x the icon: ~30px
+       on a 320px phone. Smaller than it was, still past the 24px minimum a
+       pointer target has to meet (WCAG 2.5.8). */
+    padding: calc(var(--pill-ico) * 0.4);
     font: inherit;
   }
-  /* Steps down as the bar gets smaller: 24px on phones, 28px on large phones
-     and small tablets, the full 36px once it is a column again. */
+  /* Grows with the screen rather than stepping — ~17px at 320px, ~22px at 425px,
+     the full 28px by the time the bar is on a small tablet, then 36px once it is
+     a column again. */
   .nav-item .nav-icon {
-    @apply w-6 h-6 sm:w-7 sm:h-7 nav:w-9 nav:h-9 shrink-0 origin-center;
+    @apply shrink-0 origin-center;
+    width: var(--pill-ico);
+    height: var(--pill-ico);
     transition:
       color 200ms ease,
       transform 250ms ease;
+  }
+  /* The column's own sizes, as their own rule rather than `nav:` variants inside
+     the @apply above: a variant expanded by @apply lands where the @apply sits,
+     and the plain declarations that follow it would then win at every width. */
+  @screen nav {
+    .nav-item {
+      padding: 0;
+    }
+    .nav-item .nav-icon {
+      @apply w-9 h-9;
+    }
   }
   /* Clipped rather than display:none in the bar, so each icon-only button keeps
      an accessible name. sr-only is out of flow, so it costs no layout either. */
@@ -637,6 +686,47 @@
   .hero-card {
     @apply relative rounded-[5px] p-3 sm:p-5 nav:p-[30px];
   }
+  /* The profile band is positioned out of flow, so without this the hero centres
+     the greeting in the whole screen: on a tall phone that put it low, left a
+     gap under the photo, and dropped the rest — a third of the section — into
+     one dead run above the fold's bottom edge. Reserving the band's height puts
+     the greeting in the middle of what is actually free, which spreads that run
+     as breathing room on both sides of the copy instead of banking it all at the
+     bottom.
+
+     The value is not the band's full height but 96% of it — 0.92 of the
+     viewport wide, capped by the band's own max-width — which is the very end
+     of the bottom fade, where the photo is down to a few percent. Short of the
+     full band on purpose: the copy sitting over the last of the fade rather than
+     clear of it is what keeps the picture and the greeting reading as one
+     surface. The third term is a ceiling for short screens — a landscape phone, or a browser with its chrome expanded — where
+     reserving the full band would push the greeting off the bottom. Past it the
+     copy starts in the tail of the fade instead of below it, which is where it
+     is meant to sit anyway.
+
+     The section is also left to end with its content here rather than being
+     held open to a full screen. The photo and the greeting together come to
+     well under a phone's height, and min-height would spend the difference on
+     empty page between the subtitle and the section after it. Above the nav
+     breakpoint the band is not rendered, the desktop layout does fill a screen,
+     and the section's own padding utility takes over. */
+  .hero-section {
+    min-height: auto;
+    padding-top: min(88.3vw, 24rem, 46vh);
+    /* The right side is the nav pill's width and a gap, tracked off the same
+       variable the pill is built from, so the two can never drift apart: the
+       greeting stays clear of the bar at every width without the section
+       reserving room the bar no longer needs. The left stays a utility, since
+       it is a plain step and the phone value (0.5rem, all that is needed now
+       the accent square is gone) has to appear in the type formula anyway. */
+    padding-right: calc(var(--pill-w) + 1.25rem);
+  }
+  @screen nav {
+    .hero-section {
+      min-height: 100vh;
+      padding-top: 0;
+    }
+  }
   /* Profile as a full-bleed backdrop across the top of the hero, shown only
      while the sidebar is a floating pill — the pill has no room for a photo, so
      the hero carries its own copy (as the reference does: a second #imgprofil
@@ -650,7 +740,7 @@
      the blending, so the greeting card still lands on plain white and the
      section reads as one surface rather than a photo with a page under it.
 
-     Sized in vh/px rather than the em root below, because it must also hold at
+     Sized independently of the em root below, because it must also hold at
      640-768px, where the bar is still a pill but that block no longer applies. */
   .hero-profile {
     @apply absolute left-0 right-0 top-0 mx-auto z-0 nav:hidden pointer-events-none;
@@ -721,24 +811,42 @@
      The root is the width actually left for the card — the viewport less the
      section's padding — over the card's own width in em: ~12.3em for the longest
      row of the stock copy, 1.17em for the number and its gutter, 1.4em for the
-     card's padding, then rounded up to 16.6 so the card lands at about 94% of
+     card's padding, then rounded up to 16.3 so the card lands at about 96% of
      the space rather than exactly filling it. That slack matters: the em figures
      are measured off the current copy, and with none of it a slightly wider
      glyph run would spill straight into the section's overflow clip. Clamped so
      it stays legible on a narrow phone and never overshoots the fixed step it
-     replaces. */
+     replaces.
+
+     The subtraction has to be the section's real padding, so it is written the
+     same way the section writes it — 0.5rem on the left, and on the right the
+     nav pill's own width plus its offset. Most of the size increase comes from
+     that: the box grew when the pill stopped reserving 70px for a bar that no
+     longer needs it. The divisor took the rest, 16.6 to 16.3, which is a real
+     but small bite out of the margin for error and the reason it did not take
+     more. */
   @media (max-width: 639.98px) {
     .hero-stack {
-      font-size: clamp(0.8rem, calc((100vw - 5.375rem) / 16.6), 1.875rem);
+      font-size: clamp(
+        0.8rem,
+        calc((100vw - 0.5rem - (var(--pill-w) + 1.25rem)) / 16.3),
+        1.875rem
+      );
     }
+    /* Vertical padding is free to be larger than the horizontal, which the width
+       formula above has already spent: only the sides feed into whether the card
+       fits. Taller here is what lets the block occupy the space the reserved
+       band leaves rather than sitting in it as a small cluster. */
     .hero-stack .hero-card {
-      padding: 0.7em;
+      padding: 1.15em 0.7em;
     }
     .hero-stack .hero-greeting {
       font-size: 1em;
-      /* 1.65 is the reference's own mobile ratio: line-height 200% of a 16px
-         parent against a 1.2rem row (style2.css:2261, :2297). */
-      line-height: 1.65;
+      /* The reference's own mobile ratio is 1.65 — line-height 200% of a 16px
+         parent against a 1.2rem row (style2.css:2261, :2297). Opened up from
+         there because the rows are the one part of this block that can use the
+         height without also needing width, the type being nowrap. */
+      line-height: 1.95;
       letter-spacing: -0.02em;
     }
     .hero-stack .hero-num {
@@ -752,23 +860,27 @@
       margin-left: -0.08em;
       margin-right: 0.16em;
     }
-    /* Reaches exactly to the card's padding edge (1.4 - 0.7 = 0.7em), so it can
-       never sit behind the first line number. The 0.7em overhang is also what
-       has to fit to its left: the card is ~96% of the section's content box
-       here, so it only leaves a few px of centring margin, and the section's
-       own left padding covers the rest. A larger overhang goes negative and the
-       section's overflow clip cuts the square flat against the viewport edge. */
+    /* Dropped on phones. It is an accent that only works with room around it,
+       and there is none here: the card takes nearly the whole content box, so
+       the square had to hang off the corner into the section's own padding,
+       where it read as a stray tile against the viewport edge rather than as
+       part of the card. Losing it is also what frees that padding for the type
+       below. */
     .hero-stack .hero-square {
-      width: 1.4em;
-      height: 1.4em;
-      top: -0.7em;
-      left: -0.7em;
+      display: none;
     }
     /* nowrap and sized to stay inside the card, so it reads as one line rather
        than breaking mid-phrase on a narrow screen. */
     .hero-stack .hero-subtitle {
       font-size: 0.68em;
-      padding: 0.7em;
+      /* Both in em of the subtitle's own size, so they track the fluid root like
+         everything else in the stack. The gap to the card is the two together —
+         this line carries no fill, so its top padding reads as space just as the
+         margin does, and closing only one of them would not have moved it far.
+         Kept just off zero: it still has to read as a separate line rather than
+         a fourth row of the card. */
+      padding: 0.35em 0.7em;
+      margin-top: 0.25em;
       white-space: nowrap;
     }
   }
@@ -1027,6 +1139,22 @@
   justify-content: center;
 }
 
+/* The hover sizes above are tuned to a 500px card. On a phone the card is the
+   viewport less the section padding, and 25px of "Link to the platform" is
+   wider than what is left inside the padding — it would wrap, and the footer
+   would grow into the fixed card height. Declared after the rules they replace,
+   at equal specificity, so source order is what decides it. Kept as a step up
+   rather than removed: a tap still registers as hover on touch, and the label
+   going nowhere at all would read as the card not responding. */
+@media (max-width: 639.98px) {
+  .project-card:hover .project-link {
+    font-size: 18px;
+  }
+  .project-card:hover .project-info {
+    font-size: 16px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .project-card .project-link,
   .project-card .project-info {
@@ -1164,7 +1292,7 @@
    reads as entering and leaving the page. Decorative, so it never takes
    pointer events or text selection away from the hero. */
 .mascot {
-  @apply relative w-full h-12 overflow-hidden pointer-events-none select-none;
+  @apply relative w-full h-10 sm:h-12 overflow-hidden pointer-events-none select-none;
   /* Beat between the greeting settling and the creature turning up — the
      subtitle's rise takes 700ms, so this lands just after it. Inherited by
      every part below, so the walk, hop, wave and punchline can never drift
@@ -1193,7 +1321,7 @@
 }
 /* Creature and line as one unit — takes the border. */
 .mascot-box {
-  @apply inline-flex items-end gap-3;
+  @apply inline-flex items-end gap-2 sm:gap-3;
 }
 /* Creature trails the line it is being blamed in, so the text reads first. */
 .mascot-run--trail .mascot-box {
@@ -1207,24 +1335,34 @@
   @apply inline-flex items-end shrink-0;
   transform-origin: bottom center;
 }
+/* Steps down on phones along with the line beside it. The About variant sets
+   its own height below and is hidden under sm anyway, so it is unaffected. */
 .mascot-ico {
-  @apply w-auto h-9 shrink-0;
+  @apply w-auto h-6 sm:h-9 shrink-0;
 }
 /* Regular weight — one step up from the hero greeting's light, which read as
    too faint at this size. Fira Sans 400 is loaded, so it is a real weight.
    A touch of tracking: enough to read as pixel-ish lettering, well short of
    the gap that whitespace between the character spans used to introduce. */
 .mascot-text {
-  @apply relative font-mono text-sm sm:text-base font-normal tracking-wider text-dark pb-1;
+  @apply relative font-mono text-xs sm:text-base font-normal tracking-wider text-dark pb-1;
 }
 /* Setup walks the whole way; punchline arrives early in the crossing.
    Positioned out of flow, pinned just past the end of the setup line, so its
    width never counts toward the group — that is what lets the walk start from
    just off the left edge instead of a screen-width of blank space. Being out
    of flow from the first frame also means no layout ever changes mid-walk,
-   which would make the creature jump. */
+   which would make the creature jump.
+
+   Shown at every width. It used to be dropped below sm on the grounds that the
+   phrase could not clear the right edge there, which is true of the whole walk
+   but not of the part that matters: the punchline is only opaque from 28% of
+   the crossing (@keyframes mascot-punch), and at that point the group is still
+   near the left edge, so both lines sit on screen together for a couple of
+   seconds before the pair walks off to the right. Hiding it meant the gag had
+   no payoff on a phone. */
 .mascot-punch {
-  @apply hidden sm:block absolute left-full top-0 ml-1.5 opacity-0 whitespace-nowrap;
+  @apply block absolute left-full top-0 ml-1 sm:ml-1.5 opacity-0 whitespace-nowrap;
 }
 .mascot-ch {
   @apply inline-block;

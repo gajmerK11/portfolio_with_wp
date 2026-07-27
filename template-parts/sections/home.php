@@ -17,7 +17,15 @@ defined( 'ABSPATH' ) || exit;
 // greeting card would sit underneath it. The card is centred inside what is
 // left, so it shifts left rather than being covered.
 ?>
-<section id="home" data-section="home" class="section relative min-h-screen flex flex-col justify-center items-center pl-4 pr-[70px] py-16 sm:pl-8 sm:pr-[80px] nav:p-10 overflow-hidden">
+<?php
+// Below the nav breakpoint the padding and the min-height are .hero-section's,
+// not utilities: it reserves the profile band's height, tracks the floating nav
+// pill's width on the right, and lets the section end with its content instead
+// of being held open to a full screen. Utilities win over component rules, so
+// anything left in the markup here would override the lot. `nav:p-10` is the
+// exception, and is meant to — it is what hands the desktop layout back.
+?>
+<section id="home" data-section="home" class="hero-section section relative flex flex-col justify-center items-center pl-2 sm:pl-8 pb-16 nav:p-10 overflow-hidden">
 
 	<!-- Soft animated gradient at the bottom of the hero -->
 	<div class="hero-glow" aria-hidden="true"></div>
@@ -61,7 +69,7 @@ defined( 'ABSPATH' ) || exit;
 	// upward. Out of flow, the card keeps the exact position it has without
 	// the mascot, and the creature sits low in the hero on its own.
 	?>
-	<div class="absolute left-0 right-0 bottom-[12%] z-10">
+	<div class="absolute left-0 right-0 bottom-4 nav:bottom-[12%] z-10">
 		<?php
 		get_template_part(
 			'template-parts/mascot',
