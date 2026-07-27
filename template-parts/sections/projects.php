@@ -28,18 +28,25 @@ $portfolio_projects = new WP_Query(
 // z-50 lifts the whole section above the fixed "Download CV" tab (z-40), so
 // the cards scroll over it instead of under it. The hero is left unlifted, so
 // the tab stays on top — and hoverable — there.
+//
+// No min-h-screen utility: .projects-section owns the height so it can end with
+// its content below the nav breakpoint, where the heading and one row of cards
+// come to well under a phone screen and justify-center was banking the
+// difference as blank page above the heading.
 ?>
-<section id="projects" data-section="projects" class="section relative z-50 min-h-screen flex flex-col justify-center px-4 py-10 sm:p-10 overflow-hidden">
+<section id="projects" data-section="projects" class="projects-section section relative z-50 flex flex-col justify-center px-4 py-10 sm:p-10 overflow-hidden">
 
 	<?php
 	// nowrap plus a fluid size rather than a fixed one: at 42px the heading
 	// broke onto a second line on every phone, and a heading that reflows mid-
-	// phrase reads as two headings. The floor keeps it legible at 320px, where
-	// 6vw would otherwise put it under 20px; the ceiling is the desktop size it
-	// has always been.
+	// phrase reads as two headings. Sized to use most of the column rather than
+	// to be merely safe inside it — nowrap is what makes that a real constraint,
+	// so the rate is set from the longest the phrase gets: at 8vw it comes to
+	// about three-quarters of the content box at 320px and reaches the desktop
+	// ceiling, which is the size it has always been, a little above 500px.
 	?>
 	<div class="flex items-center justify-between mb-6 sm:mb-10">
-		<h2 class="text-[clamp(1.2rem,6vw,42px)] font-semibold text-dark flex items-center gap-2 sm:gap-3 whitespace-nowrap">
+		<h2 class="text-[clamp(1.6rem,8vw,42px)] font-semibold text-dark flex items-center gap-2 sm:gap-3 whitespace-nowrap">
 			<?php esc_html_e( 'My best projects', 'portfolio' ); ?>
 			<span class="text-primary">&#10022;</span>
 		</h2>

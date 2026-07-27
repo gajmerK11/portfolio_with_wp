@@ -1010,6 +1010,21 @@
    Projects section — horizontal cards
 --------------------------------------------------------------- */
 /* Hide the scrollbar on the track (still scrollable via arrow / trackpad). */
+/* Same reasoning as .hero-section: a full-screen minimum only pays off when the
+   content is anywhere near a screen tall. On a phone the heading and one row of
+   cards come to well under that, and centring the difference put half of it
+   above the heading as blank page — read as a gap between this section and the
+   hero rather than as breathing room. The column layout does fill a screen, so
+   the minimum comes back with it. */
+.projects-section {
+  min-height: auto;
+}
+@screen nav {
+  .projects-section {
+    min-height: 100vh;
+  }
+}
+
 .projects-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
