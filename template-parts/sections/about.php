@@ -41,7 +41,39 @@ if ( '' === $a['name'] ) {
 // mascot strip below can span the full content column — out to the divider
 // line on the left — while the copy stays at a readable measure.
 ?>
-<section id="about" data-section="about" class="section relative flex flex-col pt-24 pb-12 px-10">
+<?php
+// The phone bottom padding is deeper than the tablet one, which is otherwise
+// backwards. This is the last section on the page, so the mascot strip at its
+// foot ends up level with the two fixed buttons — WhatsApp bottom-left, "Work
+// with me" bottom-right. Above sm the strip's track is inset horizontally so
+// the creature turns at their inner edges (assets/js/main.js -> fitTrack); a
+// phone has no width to give up for that, so the strip is lifted clear of them
+// instead.
+//
+// 8rem, with the strip's own mt-10 above it, is what centres the strip in the
+// space it actually has. The buttons stand about 85px off the bottom of the
+// page when it is scrolled to the end, so this padding is not free space — it
+// is 85px of button and ~43px of gap. Reading it as free space is what had the
+// strip looking like it was sitting on top of them.
+?>
+<section id="about" data-section="about" class="section relative flex flex-col pt-12 pb-32 sm:pb-12 nav:pt-24 px-4 sm:px-10">
+
+	<?php
+	// Download CV, tablet widths only (sm up to the nav breakpoint). It is a
+	// child of this section, so it exists on About and nowhere else — that is
+	// structural, no scroll logic needed.
+	//
+	// The rail is why it holds still while the copy scrolls past. The tab is
+	// sticky, and sticky travels inside its parent's box, so it needs a parent
+	// that spans the section: the rail is that, absolutely positioned down the
+	// left gutter and therefore out of the section's flex column. Putting the
+	// tab in that column directly would instead reserve its full height and
+	// push the name and the copy down the page.
+	?>
+	<div class="cv-rail" aria-hidden="false">
+		<?php echo portfolio_render_download_cv( 'about' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
+	</div>
+
 	<div class="flex flex-col max-w-4xl">
 
 	<!-- Name + location -->
@@ -71,11 +103,12 @@ if ( '' === $a['name'] ) {
 	</div>
 
 	<?php
-	// Mascot paces the foot of the section. -mx-10 cancels the section padding
-	// so its left edge is the divider line and its right edge the content
-	// edge — those are the two walls it turns around at.
+	// Mascot paces the foot of the section. The negative margin cancels the
+	// section padding so its left edge is the divider line and its right edge
+	// the content edge — those are the two walls it turns around at. It has to
+	// track the section's padding at both breakpoints, or the walls move.
 	?>
-	<div class="-mx-10 mt-24">
+	<div class="mascot-track -mx-4 sm:-mx-10 mt-10 sm:mt-24">
 		<?php
 		get_template_part(
 			'template-parts/mascot',

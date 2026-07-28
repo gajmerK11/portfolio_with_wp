@@ -33,6 +33,27 @@
        than the one being replaced. */
     --pill-ico: clamp(1.05rem, 5.2vw, 1.4rem);
     --pill-w: calc(var(--pill-ico) * 2.36);
+
+    /* How far down the hero the greeting starts — the profile band's height,
+       near enough. Named because two things outside the hero are measured off
+       it: the accent square hangs above the greeting from the same origin, and
+       the tablet "Download CV" tab is aligned to the greeting's first line
+       three sections further down the page. Left as a variable so those cannot
+       drift apart the next time this is retuned. See .hero-section for what
+       the terms mean. */
+    --hero-band-pad: min(88.3vw, 24rem, 46vh);
+  }
+  /* Tablet needs its own value because the band stops growing before the
+     viewport does: past 432px wide the band is capped by its own max-width, so
+     its height is a flat 397px while 88.3vw keeps climbing. Below sm the copy
+     is meant to sit in the tail of the band's fade; here there is room to clear
+     the band outright and it does, by about 67px. Second term is the same
+     short-screen ceiling, for a landscape tablet where reserving the full band
+     would push the greeting off the bottom. */
+  @screen sm {
+    :root {
+      --hero-band-pad: min(29rem, 56vh);
+    }
   }
   html {
     scroll-behavior: smooth;
@@ -80,11 +101,11 @@
   /* Sidebar shell — two distinct layouts, both defined here rather than as
      utilities on the element, so neither can half-override the other.
 
-     Up to and including a 768px tablet it follows the reference
+     Up to and including a 1024px tablet it follows the reference
      (style2.css:1932-1959): the full-height white column gives way to a
      floating glass pill pinned to the right edge, with the profile photo and
      social links dropped and the labels clipped, so only the nav icons remain.
-     From the `nav` screen (769px) up it is the original white column.
+     From the `nav` screen (1025px) up it is the original white column.
 
      z-[58] clears the content sections (z-50) and the scroll divider (z-55)
      that the pill now floats over, while staying under the "Work with me"
@@ -248,9 +269,16 @@
   }
   /* Grows + drifts inward when the About section is on screen. Anchored to the
      bottom it only grows — the reference's move to top:40% would drop it
-     straight onto the floating nav bar, which owns that slot. */
+     straight onto the floating nav bar, which owns that slot.
+
+     No growth at all below the column layout: the button is already close to a
+     third of the width on a phone, and at every width under `nav` it is
+     anchored bottom-right over the copy, so the extra size bought nothing and
+     only pushed it further across the text. The drift inward is what the
+     growth was for, and there is nowhere to drift to until the button moves
+     to the top edge. */
   .work-btn.is-grown {
-    scale: 1.15;
+    scale: 1;
     transition: 300ms ease-in-out;
   }
   @screen nav {
@@ -268,43 +296,29 @@
      hoverable there. The projects and testimonials sections are lifted to
      z-50, so their cards scroll over the top of it — the same layering the
      reference gives its awwwards badge. "Work with me" is z-[60], above both. */
-  /* While the nav is a floating pill it takes the right-centre slot, so this tab
-     sits top-left instead: the left edge is the one the sidebar column vacated,
-     and 5% down matches the "Work with me" button opposite it, so the two read
-     as a pair across the top. As a column it goes back to being centred on the
-     right. It tucks towards whichever edge it is pinned to.
+  /* Skin only — no position. Below the nav breakpoint there is no free edge
+     left for a fixed tab: the profile band spans the top, the nav pill holds
+     the right-centre, and the sections' own copy now runs to both margins. So
+     the tab has three homes, one per width band, and they are three different
+     parents — each variant below owns where it goes and which widths it exists
+     at. Exactly one is ever displayed, which keeps the other two out of the
+     accessibility tree so the document never offers the link twice.
 
      The vertical offset is a raw transform rather than Tailwind's
      -translate-y-1/2: the tuck animates transform too, so both states have to
      be written in the same place or one silently drops the other's half. */
   .download-cv {
-    @apply fixed left-0 right-auto top-[5%] nav:left-auto nav:right-0 nav:top-1/2 z-40 bg-badge text-white flex flex-col items-center justify-between py-4 w-[53px] h-[171px];
-    transform: none;
+    @apply z-40 bg-badge text-white flex-col items-center justify-between py-4 w-[53px] h-[171px];
     transition:
       opacity 300ms ease-in-out,
       transform 300ms ease-in-out;
   }
-  /* Past the hero: slid out sideways and switched off. The sections below are
-     transparent, so hiding it outright is the only way it stays out of the
-     way — z-index alone lets it show through the gaps between cards. */
-  .download-cv.is-tucked {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-100%);
-  }
-  @screen nav {
-    .download-cv {
-      transform: translateY(-50%);
-    }
-    .download-cv.is-tucked {
-      transform: translate(100%, -50%);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .download-cv {
-      transition: none;
-    }
-  }
+
+  /* The mark and the label are written here, above the variants, and not below
+     them. `.download-cv .cv-mark` and `.download-cv--about .cv-mark` are both
+     one class plus one class, so specificity cannot separate them and source
+     order decides — with these last, every size a variant set for its own
+     narrower tab was being overridden by the desktop size. */
   .download-cv .cv-mark {
     @apply font-bold text-xl leading-none;
   }
@@ -316,6 +330,130 @@
   /* Letters need to be inline-block to take a transform of their own. */
   .download-cv .cv-letter {
     @apply inline-block;
+  }
+
+  /* Desktop: fixed to the right edge, centred. Shown on the hero and again on
+     About, slid out in between (assets/js/main.js -> setupDownloadCv) — the
+     sections in between are transparent, so switching it off is the only way
+     it stays out of the way; z-index alone lets it show through the gaps
+     between cards.
+
+     display is set outside the @apply on purpose: a `nav:flex` inside one
+     expands as a media query at the position of the @apply, and any plain
+     declaration written after it would then win at every width. */
+  .download-cv--fixed {
+    @apply fixed left-auto right-0 top-1/2;
+    display: none;
+    transform: translateY(-50%);
+  }
+  .download-cv--fixed.is-tucked {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(100%, -50%);
+  }
+  @screen nav {
+    .download-cv--fixed {
+      display: flex;
+    }
+  }
+
+  /* Phones: the contact panel's top-right corner, flush to the edge. The panel
+     is fixed, so absolute here resolves against the panel itself.
+
+     Narrower than the desktop tab, 44px against 53px, and its height is
+     whatever the contents come to. Both narrow copies set the gap between the
+     mark and the label outright — 20px, what the desktop tab happens to end up
+     with — instead of leaving it to justify-between in a fixed-height box.
+     That gap is the thing being matched, and as a leftover it was a function
+     of the box height, the padding and the rendered length of the word, so it
+     moved every time any of the three was touched. */
+  .download-cv--contact {
+    @apply absolute top-0 right-0 w-11 h-auto py-2 justify-start gap-5;
+    display: flex;
+  }
+  @screen sm {
+    .download-cv--contact {
+      display: none;
+    }
+  }
+
+  /* Tablet: the About section's left gutter, and nowhere else on the page.
+     The rail is the travel lane the sticky tab runs in — absolute, so it is
+     out of the section's flex column and reserves no vertical space, and
+     top-0/bottom-0 so the tab can be held anywhere in the section's height.
+     It is the rail that carries the width band; the tab inside simply fills
+     it, so there is one place to change how wide this thing is.
+
+     Click-through, because the lane is the full height of the section and
+     only the tab in it is meant to be a target. */
+  .cv-rail {
+    @apply absolute left-0 top-0 bottom-0 w-8 z-40 pointer-events-none;
+    display: none;
+  }
+  @screen sm {
+    .cv-rail {
+      display: block;
+    }
+  }
+  @screen nav {
+    .cv-rail {
+      display: none;
+    }
+  }
+  /* Sticky, not absolute: the tab holds its place on screen while the About
+     copy scrolls past it, and still leaves with the section at either end, so
+     it never appears anywhere else.
+
+     The offset is the hero's own: --hero-band-pad is .hero-section's
+     padding-top, and 29px is how far below that the greeting's first line sets
+     its cap top — the card's 20px padding, the strut's half-leading, and the
+     drop from Fira Sans's ascender to its cap height. So the tab's top edge
+     lands on the same line as the K of "Kumar" three sections above it, and
+     retuning the hero carries this with it rather than silently breaking the
+     alignment. */
+  .download-cv--about {
+    @apply sticky w-full h-auto py-3 px-1 justify-start gap-5;
+    top: calc(var(--hero-band-pad) + 29px);
+    display: flex;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateX(-100%);
+    /* Slower and eased-out rather than the shared 300ms ease-in-out. The tab
+       is only 32px wide, so translateX(-100%) is 32px of travel — at 300ms
+       that is over almost before it registers, and it reads as a pop rather
+       than a slide. The long tail on the curve is what makes it arrive rather
+       than stop. */
+    transition:
+      opacity 620ms ease-out,
+      transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Slides in from the left edge it is pinned to, once About is reached
+     (assets/js/main.js -> setupDownloadCv). Held off until then rather than
+     simply being there, so arriving at the section is what produces it. */
+  .download-cv--about.is-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  /* Stepped down to clear the rail's 32px less its px-1: at the desktop text-xl
+     the two letters came to wider than the tab itself and ran over both edges,
+     which is what read as the mark having no padding. */
+  .download-cv--about .cv-mark {
+    @apply text-xs;
+  }
+
+  /* Both narrow copies step the label down with the box. The label is set
+     vertically, so its font size and tracking are what set its height, not
+     its width — at the desktop 13px and tracking-wide the word ran the whole
+     tab. It no longer has any say in the gap above it, which is now stated
+     outright; this is purely about the word fitting the shorter box. */
+  .download-cv--contact .cv-label,
+  .download-cv--about .cv-label {
+    @apply text-[11px] tracking-tighter;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .download-cv {
+      transition: none;
+    }
   }
   /* Hover: the mark beats, the letters press in one after another. The
      label is rotated, so its local X reads as horizontal on screen. */
@@ -330,8 +468,29 @@
      (30×30 icon, fixed bottom:20px right:20px). */
   /* Bottom-left below the nav breakpoint: the "Work with me" pill takes the
      bottom-right corner there, and the two would sit on top of each other. */
+  /* Below the column layout the two floating buttons flank the same strip of
+     page, so this one is levelled with the other rather than pinned a flat
+     20px up. Both are 30px of icon in a 50px box against a pill whose height
+     is its two label rows, so matching their centres is 5% of the viewport —
+     "Work with me"'s own anchor, tracked so they cannot drift apart when the
+     viewport height changes — plus half the difference in their heights:
+     3px against the phone pill's 56px, 6px against the tablet's 62px.
+
+     At `nav` the pill moves to the top edge and the two stop sharing a row,
+     so this goes back to its own offset. */
   .whatsapp-btn {
-    @apply fixed bottom-5 left-2 right-auto nav:left-auto nav:right-5 z-[70] flex items-center justify-center px-[15px] py-[10px] bg-transparent border-0 no-underline transition-transform duration-150;
+    @apply fixed left-2 right-auto nav:left-auto nav:right-5 z-[70] flex items-center justify-center px-[15px] py-[10px] bg-transparent border-0 no-underline transition-transform duration-150;
+    bottom: calc(5% + 3px);
+  }
+  @screen sm {
+    .whatsapp-btn {
+      bottom: calc(5% + 6px);
+    }
+  }
+  @screen nav {
+    .whatsapp-btn {
+      bottom: 1.25rem;
+    }
   }
   .whatsapp-btn svg {
     @apply w-[30px] h-[30px] block;
@@ -343,13 +502,42 @@
   /* Testimonial cards ("They trusted me"). Reference metrics: 300px max
      width, 20px gap, 20px padding, centred text, and a blurred white plate
      behind the copy instead of a solid card background. */
-  /* One horizontal track, same mechanics as a project row: cards keep their
-     300px width and the row scrolls rather than wrapping. */
+  /* Three layouts, one per width band. Phones stack the cards in a single
+     column; tablets wrap them into centred rows; only the column layout keeps
+     the horizontal track.
+
+     A scroller is the wrong shape below the column layout. It hides all but
+     the first card behind a gesture the page gives no sign of, and these are
+     testimonials — the point is that there are several. Wrapped, they are all
+     simply there.
+
+     Nothing is needed in JS for the switch: setupProjectsScroll measures
+     scrollWidth against clientWidth to decide whether the row overflows, a
+     wrapped row does not, and it already re-runs that on resize. So the arrows
+     hide themselves and the loop clones are dropped on their own. */
   .reviews {
-    @apply relative z-10 flex justify-start gap-5 py-8 overflow-x-auto snap-x scroll-smooth;
+    @apply relative z-10 flex flex-col items-center gap-5 py-8;
   }
+  @screen sm {
+    .reviews {
+      @apply flex-row flex-wrap justify-center;
+    }
+  }
+  @screen nav {
+    .reviews {
+      @apply flex-nowrap justify-start overflow-x-auto snap-x scroll-smooth;
+    }
+  }
+  /* Full width up to the reference's 300px, not a flat 300px: on a 320px phone
+     a fixed card is wider than the column it sits in, and the stack has no
+     scroller left to reach the overhang with. */
   .review-card {
-    @apply relative shrink-0 snap-start rounded-[10px] p-5 w-[300px] text-center;
+    @apply relative shrink-0 snap-start rounded-[10px] p-5 w-full max-w-[300px] text-center;
+  }
+  @screen sm {
+    .review-card {
+      @apply w-[300px];
+    }
   }
   .review-card::after {
     content: "";
@@ -671,8 +859,13 @@
   .contact-panel .cp-succ {
     @apply mx-8 my-1 text-green-700 text-sm;
   }
+  /* Pushed right with an auto margin inside its .cp-group rather than floated
+     with a margin of its own: the group already carries the mx-8 every field
+     above uses, so the old mr-8 was a second 32px inset on top of it and the
+     button stopped short of the field edges. As a block it also gives the
+     group a real height, which a float did not. */
   .contact-panel .cp-form button[type="submit"] {
-    @apply float-right mr-8 bg-primary text-white border-0 rounded-[5px] px-8 py-4 text-lg cursor-pointer transition-transform duration-200;
+    @apply block ml-auto bg-primary text-white border-0 rounded-[5px] px-8 py-4 text-lg cursor-pointer transition-transform duration-200;
   }
   .contact-panel .cp-form button[type="submit"]:hover {
     @apply scale-105 bg-accent-dark;
@@ -712,7 +905,7 @@
      and the section's own padding utility takes over. */
   .hero-section {
     min-height: auto;
-    padding-top: min(88.3vw, 24rem, 46vh);
+    padding-top: var(--hero-band-pad);
     /* The right side is the nav pill's width and a gap, tracked off the same
        variable the pill is built from, so the two can never drift apart: the
        greeting stays clear of the bar at every width without the section
@@ -796,9 +989,12 @@
      longer copy entered in the Customizer would still need the divisor raised.
      Clamped so it stays readable on a 320px phone and never overshoots the
      fixed step it replaces. */
+  /* The largest step is xl (1280px), not lg (1024px). lg now falls inside the
+     tablet range — nav switches at 1025 — so it would have handed the tablet
+     layout the desktop type at exactly 1024 and nowhere else. */
   .hero-greeting {
-    @apply text-3xl sm:text-4xl nav:text-5xl lg:text-[3.8rem];
-    @apply leading-[2.4rem] sm:leading-[2.8rem] nav:leading-[3.6rem] lg:leading-[5rem];
+    @apply text-3xl sm:text-4xl nav:text-5xl xl:text-[3.8rem];
+    @apply leading-[2.4rem] sm:leading-[2.8rem] nav:leading-[3.6rem] xl:leading-[5rem];
   }
   /* Below sm the hero is scaled from a single fluid root on .hero-stack and
      every part inside is expressed in em, so the card, the rows, the line
@@ -1428,15 +1624,22 @@ html:not(.pre-typing) .mascot--hero .mascot-ch {
    contact is what reads as an impact.
 
    Runs only while the strip is on screen (JS toggles .is-walking), since this
-   animation never ends on its own. Hidden below `sm`, where the ~50 character
-   line is wider than the screen and has nowhere to pace. */
+   animation never ends on its own.
+
+   Shown at every width. It used to be dropped below `sm` because the ~50
+   character line is around 380px as one row — wider than a phone, so there was
+   nothing to pace across. It wraps to two or three rows there instead, which
+   is what buys back the travel; see the phone block further down. */
 .mascot--about {
   /* Height is the box plus a hair — any more and the strip reads as padding
      added to make room for it rather than as the box sitting there. */
-  @apply hidden sm:block h-9;
-  /* One leg of the pace. Shared so travel, squash and the turn stay locked
-     together — they must reach each wall on the same frame. */
-  --mascot-leg: 8s;
+  @apply block h-9;
+  /* One leg of the pace, wall to wall. Shared so travel, squash and the turn
+     stay locked together — they must reach each wall on the same frame. It is
+     a duration, not a speed, so the same value walks a narrow track slower:
+     see the phone value below, where the track is a fraction of the desktop
+     one and this alone would have it crawling. */
+  --mascot-leg: 6.5s;
 }
 /* Boxed, so the pair reads as one object hitting the edges. Scaled down from
    the hero creature's sizing — this one lives beside body copy, where it
@@ -1449,6 +1652,42 @@ html:not(.pre-typing) .mascot--hero .mascot-ch {
 }
 .mascot--about .mascot-text {
   @apply text-[11px] sm:text-xs pb-0;
+}
+/* Phones. One row, as everywhere else — which means the whole box has to fit a
+   320px screen with something left to walk in, and the ~50 character line is
+   380px at the tablet size. So every part of it comes down together:
+
+     text     12px -> 9px, and the tracking off       ~294px -> ~220px
+     creature 24px -> 16px tall                          26px -> 17px
+     gap + padding + border                              30px -> 18px
+                                                        ------------
+     box                                               ~380px -> ~255px
+
+   Dropping tracking-wider is worth 23px on its own here — a 0.05em letter
+   space over 50 characters is most of a word. Leaves ~65px of pace at 320px,
+   ~120px at 375px.
+
+   Height stated, never auto: .mascot-run is absolutely positioned, so it adds
+   nothing to this box's height, and auto collapses the strip to 0 — where the
+   overflow-hidden that clips the walk at the edges clips the creature too. */
+@media (max-width: 639.98px) {
+  .mascot--about {
+    height: 2rem;
+    /* Shorter leg because the track is shorter. A phone gives the walk about
+       65px against the desktop's several hundred, and the leg is a duration —
+       held at the shared value the creature covers that 65px at a few pixels a
+       second, which reads as standing still and twitching rather than pacing. */
+    --mascot-leg: 4s;
+  }
+  .mascot--about .mascot-box {
+    @apply gap-1 px-1.5;
+  }
+  .mascot--about .mascot-ico {
+    @apply h-4;
+  }
+  .mascot--about .mascot-text {
+    @apply text-[9px] tracking-normal;
+  }
 }
 /* Lightning: a bright arc of the scroll-line gradient (#b8ceff -> #004fff,
    same as .divider-line) chasing itself around the border.

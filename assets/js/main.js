@@ -231,7 +231,16 @@
    */
   function setupAboutMascot() {
     var strip = document.querySelector(".mascot--about");
-    if (!strip || !("IntersectionObserver" in window)) {
+    if (!strip) {
+      return;
+    }
+
+    fitTrack(strip);
+    window.addEventListener("resize", function () {
+      fitTrack(strip);
+    });
+
+    if (!("IntersectionObserver" in window)) {
       return;
     }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -246,10 +255,82 @@
         }
         strip.classList.add("is-walking");
         observer.disconnect();
+        // Arriving at About also grows the "Work with me" button, over 300ms.
+        // Re-measure once that has settled, or the right-hand wall is set from
+        // the button's smaller, pre-growth edge and the creature walks under
+        // the difference.
+        window.setTimeout(function () {
+          fitTrack(strip);
+        }, 400);
       },
       { threshold: 0 }
     );
     observer.observe(strip);
+  }
+
+  /**
+   * Pull the pacing mascot's track in to the inner edges of the two fixed
+   * buttons that share the foot of the page — WhatsApp bottom-left, "Work with
+   * me" bottom-right — so the creature turns at them instead of walking
+   * underneath.
+   *
+   * Measured rather than written as constants: both buttons are positioned in
+   * percentages of the viewport, and the right-hand one is scaled up while
+   * About is on screen, so where their edges actually fall is not something the
+   * stylesheet knows.
+   *
+   * The padding goes on the wrapper, not the strip. .mascot-run is absolutely
+   * positioned and its offsets resolve against its containing block's padding
+   * box — padding on the strip itself would not move the walls at all.
+   *
+   * Left alone below sm and whenever the walls would leave less room than the
+   * creature needs to walk in: a track shorter than the thing pacing it has no
+   * pace left, only a shuffle between two overhangs.
+   */
+  function fitTrack(strip) {
+    var track = strip.parentElement;
+    if (!track) {
+      return;
+    }
+
+    track.style.paddingLeft = "";
+    track.style.paddingRight = "";
+
+    if (!window.matchMedia("(min-width: 640px)").matches) {
+      return;
+    }
+
+    var walker = strip.querySelector(".mascot-run");
+    var work = document.querySelector(".work-btn");
+
+    // The WhatsApp icon, not its button. The button carries 15px of padding
+    // either side of a 30px glyph and no background, so its box reaches 15px
+    // past anything you can see — measured off that, the creature turns in mid
+    // air. The Work button is filled to its own edges, so there its box is the
+    // visible edge.
+    var wa = document.querySelector(".whatsapp-btn svg");
+    if (!wa) {
+      wa = document.querySelector(".whatsapp-btn");
+    }
+    if (!walker || (!wa && !work)) {
+      return;
+    }
+
+    var box = track.getBoundingClientRect();
+    var left = wa ? Math.max(0, wa.getBoundingClientRect().right - box.left) : 0;
+    var right = work
+      ? Math.max(0, box.right - work.getBoundingClientRect().left)
+      : 0;
+
+    // offsetWidth, not the rect: the walker is squashed on contact, and a
+    // transformed rect would report the compressed width at the moment of
+    // measuring and hand back a wall that moves.
+    if (box.width - left - right < walker.offsetWidth + 24) {
+      return;
+    }
+
+    track.style.paddingLeft = left + "px";
+    track.style.paddingRight = right + "px";
   }
 
   /**
@@ -362,39 +443,64 @@
    * places it has something to do — and is tucked away in between. Layering
    * alone can't keep it out of the way over the middle sections: those are
    * transparent, so it would show through the gaps between cards.
+   *
+   * Two elements, one per width band. #download-cv is the fixed desktop tab
+   * and gets .is-tucked as above. .download-cv--about is the tablet copy,
+   * which sits inside the About section and so needs no hiding — it only
+   * gets .is-in, to slide in from the edge on arrival. The phone copy is in
+   * the contact panel and has nothing to do with scrolling at all.
    */
   function setupDownloadCv() {
     var tab = document.getElementById("download-cv");
     var home = document.getElementById("home");
     var about = document.getElementById("about");
-    if (!tab) {
-      return;
+
+    if (tab) {
+      // Leaving the hero hides it; coming back up to the hero shows it again.
+      if (home) {
+        ScrollTrigger.create({
+          trigger: home,
+          start: "bottom 60%",
+          onEnter: function () {
+            tab.classList.add("is-tucked");
+          },
+          onLeaveBack: function () {
+            tab.classList.remove("is-tucked");
+          },
+        });
+      }
+
+      // Reaching About brings it back; scrolling back out of About hides it.
+      if (about) {
+        ScrollTrigger.create({
+          trigger: about,
+          start: "top 70%",
+          onEnter: function () {
+            tab.classList.remove("is-tucked");
+          },
+          onLeaveBack: function () {
+            tab.classList.add("is-tucked");
+          },
+        });
+      }
     }
 
-    function tuck() {
-      tab.classList.add("is-tucked");
-    }
-    function show() {
-      tab.classList.remove("is-tucked");
-    }
-
-    // Leaving the hero hides it; coming back up to the hero shows it again.
-    if (home) {
-      ScrollTrigger.create({
-        trigger: home,
-        start: "bottom 60%",
-        onEnter: tuck,
-        onLeaveBack: show,
-      });
-    }
-
-    // Reaching About brings it back; scrolling back out of About hides it.
-    if (about) {
+    // The tablet copy lives inside About and starts off the left edge at zero
+    // opacity; reaching the section slides it in. Same trigger point as the
+    // fixed tab's, so the two read as one behaviour at the width each owns.
+    // The class is toggled regardless of viewport — outside the tablet band
+    // this element is inside a display:none rail, so it costs nothing.
+    var aboutTab = document.querySelector(".download-cv--about");
+    if (about && aboutTab) {
       ScrollTrigger.create({
         trigger: about,
         start: "top 70%",
-        onEnter: show,
-        onLeaveBack: tuck,
+        onEnter: function () {
+          aboutTab.classList.add("is-in");
+        },
+        onLeaveBack: function () {
+          aboutTab.classList.remove("is-in");
+        },
       });
     }
   }
@@ -738,8 +844,8 @@
     }
 
     // Must match the `nav` screen in tailwind.config.js — the width the bar's
-    // two layouts switch at. A 768px tablet still gets the floating bar.
-    var column = window.matchMedia("(min-width: 769px)");
+    // two layouts switch at. A 1024px tablet still gets the floating bar.
+    var column = window.matchMedia("(min-width: 1025px)");
     var EDGE = 8;
     var STEP = 16;
     var placed = false;

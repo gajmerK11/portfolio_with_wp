@@ -34,7 +34,12 @@ $portfolio_projects = new WP_Query(
 // come to well under a phone screen and justify-center was banking the
 // difference as blank page above the heading.
 ?>
-<section id="projects" data-section="projects" class="projects-section section relative z-50 flex flex-col justify-center px-4 py-10 sm:p-10 overflow-hidden">
+<?php
+// Padding written as four separate utilities rather than `py-10 sm:p-10`: the
+// bottom is deliberately smaller than the top below sm, so the gap into the
+// testimonials heading is not the sum of two full-size paddings.
+?>
+<section id="projects" data-section="projects" class="projects-section section relative z-50 flex flex-col justify-center px-4 pt-10 pb-4 sm:px-10 sm:pt-10 sm:pb-10 overflow-hidden">
 
 	<?php
 	// nowrap plus a fluid size rather than a fixed one: at 42px the heading
@@ -59,7 +64,7 @@ $portfolio_projects = new WP_Query(
 		$portfolio_rows = array_chunk( $portfolio_projects->posts, 4 );
 		foreach ( $portfolio_rows as $portfolio_row ) :
 			?>
-			<div class="project-row carousel-row relative mb-8" data-carousel>
+			<div class="project-row carousel-row relative mb-4 sm:mb-8" data-carousel>
 				<div class="projects-scroll flex gap-6 overflow-x-auto pb-4 snap-x scroll-smooth" data-carousel-track>
 					<?php
 					foreach ( $portfolio_row as $portfolio_index => $portfolio_post ) :

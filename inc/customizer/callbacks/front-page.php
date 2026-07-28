@@ -191,23 +191,71 @@ function portfolio_render_fp_subtitle() {
 }
 
 /**
- * Render the "Download CV" vertical tab pinned to the right edge.
+ * Render the "Download CV" vertical tab.
  *
  * Links to the file chosen in Customizer > Front Page. Rendered as a
  * selective-refresh partial so it gets a pencil icon in the preview.
  *
+ * Printed three times, once per variant, because the tab belongs somewhere
+ * different at each width and there is no single position CSS could move it
+ * between — the three homes are in three different parents:
+ *
+ *  - fixed   header.php, pinned to the right edge. Shown from the nav
+ *            breakpoint up; that copy is the one the scroll logic drives, so
+ *            it keeps the id.
+ *  - contact template-parts/contact.php, in the slide-in panel's top-right
+ *            corner. Shown below sm.
+ *  - about   the About section's left gutter, as wide as the gutter. Shown
+ *            between sm and the nav breakpoint.
+ *
+ * Exactly one is displayed at any width (see .download-cv--* in
+ * src/input.css), so the hidden two stay out of the accessibility tree and
+ * the document never offers the same link twice.
+ *
+ * @param string $variant One of 'fixed', 'contact', 'about'.
  * @return string
  */
-function portfolio_render_download_cv() {
+function portfolio_render_download_cv( $variant = 'fixed' ) {
 	// Prefer the CV uploaded on the site owner's profile; fall back to the
 	// legacy Customizer setting when the CV module is unavailable.
 	$cv_url  = function_exists( 'portfolio_cv_url' ) ? portfolio_cv_url() : get_theme_mod( 'portfolio_cv_url', '' );
 	$cv_name = function_exists( 'portfolio_cv_download_name' ) ? portfolio_cv_download_name() : '';
 
+	// Spelled out per variant rather than concatenated from $variant. Tailwind
+	// tree-shakes its components layer against the literal text of these files,
+	// so a class name assembled at runtime is a class name whose rule never
+	// gets compiled. The default also covers the Customizer calling this as a
+	// partial render_callback, which passes a WP_Customize_Partial, not a
+	// string.
+	switch ( $variant ) {
+		case 'contact':
+			$cv_class = 'download-cv download-cv--contact';
+			break;
+		case 'about':
+			$cv_class = 'download-cv download-cv--about';
+			break;
+		default:
+			$variant  = 'fixed';
+			$cv_class = 'download-cv download-cv--fixed';
+	}
+
+	// Only the fixed copy carries the id: assets/js/main.js -> setupDownloadCv
+	// toggles .is-tucked on it as the hero and About scroll past, and the other
+	// two are placed inside the section they belong to, so they have nothing to
+	// be tucked out of.
+	$cv_id = ( 'fixed' === $variant ) ? ' id="download-cv"' : '';
+
+	// No full stop on either narrow copy: those tabs are a third narrower than
+	// the desktop one and the mark is centred, so the stop both threw the two
+	// letters off-centre and pushed the whole thing past the tab's edges. Text
+	// rather than CSS because there is no honest way to drop a character with
+	// a rule — only tricks that leave it in the accessible name.
+	$cv_mark = ( 'fixed' === $variant ) ? 'CV.' : 'CV';
+
 	ob_start();
 	?>
-	<a id="download-cv" class="download-cv" <?php echo $cv_url ? 'href="' . esc_url( $cv_url ) . '" download="' . esc_attr( $cv_name ? $cv_name : 'CV' ) . '" target="_blank" rel="noopener noreferrer"' : 'href="#"'; ?>>
-		<span class="cv-mark" aria-hidden="true">CV.</span>
+	<a<?php echo $cv_id; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal above. ?> class="<?php echo esc_attr( $cv_class ); ?>" <?php echo $cv_url ? 'href="' . esc_url( $cv_url ) . '" download="' . esc_attr( $cv_name ? $cv_name : 'CV' ) . '" target="_blank" rel="noopener noreferrer"' : 'href="#"'; ?>>
+		<span class="cv-mark" aria-hidden="true"><?php echo esc_html( $cv_mark ); ?></span>
 		<?php
 		// One span per letter so they can be bounced in sequence on hover.
 		$cv_label   = __( 'Download', 'portfolio' );

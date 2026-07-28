@@ -32,12 +32,19 @@ if ( ! $portfolio_testimonials->have_posts() ) {
 // z-50 for the same reason as the projects section: the cards pass over the
 // fixed "Download CV" tab rather than under it.
 ?>
-<section id="testimonials" class="section relative z-50 pb-10 px-10 overflow-hidden">
+<section id="testimonials" class="section relative z-50 pb-6 nav:pb-10 px-4 sm:px-10 overflow-hidden">
 
 	<!-- Soft animated gradient at the bottom, as on the hero -->
 	<div class="hero-glow" aria-hidden="true"></div>
 
-	<h2 class="relative z-10 text-[42px] font-semibold text-dark mb-5 flex items-center gap-3">
+	<?php
+	// Same heading treatment as the projects section: nowrap plus a fluid size,
+	// because at a flat 42px the phrase broke onto a second line on every phone
+	// and a heading that reflows mid-phrase reads as two headings. 8vw is the
+	// rate the longest of these headings can carry — see the section's mobile
+	// side padding above, which was cut to 1rem for the same reason.
+	?>
+	<h2 class="relative z-10 text-[clamp(1.6rem,8vw,42px)] font-semibold text-dark mb-5 flex items-center gap-2 sm:gap-3 whitespace-nowrap">
 		<?php esc_html_e( 'They trusted me', 'portfolio' ); ?>
 		<span class="text-primary">&#10022;</span>
 	</h2>

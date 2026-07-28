@@ -21,9 +21,33 @@ if ( empty( $portfolio_experience ) ) {
 	return;
 }
 ?>
-<section id="experience" data-section="experience" class="section relative z-50 py-24 px-10 overflow-hidden">
+<?php
+// Reduced vertical padding below the column layout. The 6rem the desktop uses
+// is a gap between two neighbouring sections of *twice* that, both paddings
+// meeting — 12rem of blank page, which is a whole screen of nothing on a
+// phone and most of one on a tablet. The bottom is smaller than the top
+// because the last .xp-entry brings its own py-4 with it, so the gap into the
+// next heading already starts 1rem ahead.
+//
+// The 24s are restored at `nav` rather than left as the sm value: sm reaches
+// all the way up, so without that the column layout would inherit the tablet
+// spacing too.
+//
+// Sides spelled out rather than `py-*`: the shorthand and the single-side
+// utilities are separate groups in Tailwind's output order, so a `nav:py-24`
+// would not reliably outrank a plain `pb-6`.
+?>
+<section id="experience" data-section="experience" class="section relative z-50 pt-12 pb-6 sm:pb-10 nav:pt-24 nav:pb-24 px-4 sm:px-10 overflow-hidden">
 
-	<h2 class="relative z-10 text-[42px] font-semibold text-dark flex items-center gap-3 mb-14">
+	<?php
+	// Same heading treatment as the projects section: nowrap plus a fluid size,
+	// because at a flat 42px the phrase broke onto a second line on every phone
+	// and a heading that reflows mid-phrase reads as two headings. This is the
+	// longest of the four headings, so it is the one that sets what 8vw can be:
+	// at 320px it wants about 239px, which is why the section's mobile side
+	// padding above was cut to 1rem to match the projects section.
+	?>
+	<h2 class="relative z-10 text-[clamp(1.6rem,8vw,42px)] font-semibold text-dark flex items-center gap-2 sm:gap-3 whitespace-nowrap mb-6 sm:mb-14">
 		<?php esc_html_e( "Where I've worked", 'portfolio' ); ?>
 		<span class="text-primary">&#10022;</span>
 	</h2>

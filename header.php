@@ -64,8 +64,13 @@ defined( 'ABSPATH' ) || exit;
 		</span>
 	</a>
 
-	<!-- Download CV side tab — editable via Customizer > Front Page -->
-	<?php echo portfolio_render_download_cv(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
+	<?php
+	// Download CV side tab — editable via Customizer > Front Page. This copy is
+	// the fixed right-edge one and shows from the nav breakpoint up; below it
+	// the contact-panel and About copies take over. See
+	// portfolio_render_download_cv().
+	?>
+	<?php echo portfolio_render_download_cv( 'fixed' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
 
 	<!-- Slide-in contact panel (opened by "Work with me") -->
 	<?php get_template_part( 'template-parts/contact' ); ?>

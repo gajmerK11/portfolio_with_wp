@@ -25,6 +25,15 @@ $cp_phone = apply_filters( 'portfolio_contact_phone', '' );
 <!-- The panel itself -->
 <aside class="contact-panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Contact', 'portfolio' ); ?>" aria-hidden="true">
 
+	<?php
+	// Download CV, phone widths only. The page has nowhere to put the tab there
+	// — the left edge it used to occupy is where the profile band and the
+	// sections' own content now start — so it moves in here, into the panel's
+	// top-right corner beside the Back button. Positioned against the panel,
+	// which is fixed and so is its own containing block.
+	?>
+	<?php echo portfolio_render_download_cv( 'contact' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
+
 	<!-- Back -->
 	<button type="button" class="cp-back" data-contact-close>
 		<span class="cp-back-ico" aria-hidden="true">

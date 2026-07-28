@@ -36,9 +36,23 @@ if ( ! $portfolio_skills->have_posts() ) {
 // z-50 for the same reason as the projects/testimonials sections: content
 // passes over the fixed "Download CV" tab rather than under it.
 ?>
-<section id="skills" data-section="skills" class="section relative z-50 py-24 px-10 overflow-hidden">
+<?php
+// Reduced vertical padding below the column layout, for the same reason as the
+// experience section: two neighbouring 6rem paddings meet as 12rem of blank
+// page. The top is the smaller of the two — the timeline above ends with its
+// last entry's own padding, so the heading needs less clearance than the grid
+// below it. The 24s come back at `nav`, since sm otherwise reaches the column
+// layout as well.
+?>
+<section id="skills" data-section="skills" class="section relative z-50 pt-6 pb-12 sm:pt-10 nav:pt-24 nav:pb-24 px-4 sm:px-10 overflow-hidden">
 
-	<h2 class="relative z-10 text-[42px] font-semibold text-dark flex items-center gap-3 mb-14">
+	<?php
+	// Same heading treatment as the projects section: nowrap plus a fluid size.
+	// This phrase is short enough that it would never have wrapped, but the rate
+	// is shared across all four headings on purpose — a heading that sized
+	// itself to its own length would be a different size in every section.
+	?>
+	<h2 class="relative z-10 text-[clamp(1.6rem,8vw,42px)] font-semibold text-dark flex items-center gap-2 sm:gap-3 whitespace-nowrap mb-6 sm:mb-14">
 		<?php esc_html_e( 'My skills', 'portfolio' ); ?>
 		<span class="text-primary">&#10022;</span>
 	</h2>

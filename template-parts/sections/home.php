@@ -51,8 +51,19 @@ defined( 'ABSPATH' ) || exit;
 	<div class="hero-stack relative z-10 flex flex-col items-center">
 
 		<div class="relative">
-			<!-- Mini-square peeking out top-left, blue gradient drifting across it -->
-			<div class="hero-square absolute w-10 h-10 -top-3 -left-3 sm:w-16 sm:h-16 sm:-top-5 sm:-left-5 nav:w-20 nav:h-20 nav:-top-[30px] nav:-left-[30px] rounded-[5px] z-0" aria-hidden="true"></div>
+			<?php
+			// Mini-square peeking out top-left, blue gradient drifting across it.
+			//
+			// The top offset is what sets the gap to the line-number below it,
+			// and it does not scale with the square: the square's bottom edge
+			// lands at (offset + size) from the wrapper, while the number's cap
+			// top is fixed by the card padding and the greeting's own leading.
+			// At -top-5 the tablet square ended 2px below where 01 starts, which
+			// is why it covered it. -top-10 clears the number by about 22px,
+			// wider than the desktop relationship on purpose — the square has
+			// more room above it here now the greeting sits clear of the band.
+			?>
+			<div class="hero-square absolute w-10 h-10 -top-3 -left-3 sm:w-16 sm:h-16 sm:-top-10 sm:-left-5 nav:w-20 nav:h-20 nav:-top-[30px] nav:-left-[30px] rounded-[5px] z-0" aria-hidden="true"></div>
 
 			<div class="hero-card z-10">
 				<?php echo portfolio_render_fp_greeting(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in callback. ?>
