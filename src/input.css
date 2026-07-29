@@ -637,8 +637,13 @@
      Chip and skill icons are normalized (object-contain inside a fixed box)
      so mismatched uploaded logos still form a tidy square / uniform circles.
   --------------------------------------------------------------- */
+  /* The column count is left entirely to the track sizing: a card drops to the
+     next row only when the remaining width is under the 280px minimum, so a
+     wide window packs four or five categories into one row instead of being
+     held to three by a fixed measure. The minimum is the width the longest
+     skill label ("RESTful APIs & GraphQL") needs beside its icon. */
   .skills-grid {
-    @apply grid gap-6 max-w-[1100px];
+    @apply grid gap-6;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
   /* Flat card, but it lifts on hover: a soft navy-tinted shadow and a navy
