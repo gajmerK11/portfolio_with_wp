@@ -1090,9 +1090,12 @@
     @apply shrink-0 text-neutral font-thin text-sm sm:text-lg nav:text-2xl mr-2 sm:mr-3 nav:mr-5;
   }
   /* Inline icon inside a greeting line. Reference sizing: 1.2rem tall,
-     pulled 5px back towards the word it belongs to. */
+     pulled 5px back towards the word it belongs to. It steps up with the two
+     largest type steps — held at the reference size against 48px and 61px
+     rows, the mark read as a footnote beside the word rather than as part of
+     the line. */
   .hero-card .hero-ico {
-    @apply inline-block h-[1.2rem] w-auto ml-[-5px] mr-1 align-baseline;
+    @apply inline-block h-[1.2rem] nav:h-[1.5rem] xl:h-[1.8rem] w-auto ml-[-5px] mr-1 align-baseline;
   }
   .hero-card::before {
     content: "";
