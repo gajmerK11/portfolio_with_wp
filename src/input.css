@@ -961,7 +961,8 @@
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
   }
-  /* The shared partial renders an avatar — circular, white ring, drop shadow.
+  /* The shared partial renders an avatar — circular, white ring inside a blue
+     ring, drop shadow.
      None of that applies to a backdrop. Element selector included so this
      outranks the utilities the partial carries.
 
@@ -971,7 +972,7 @@
      `intersect` puts `xor` on the second layer, which excludes instead of
      intersecting and inverts the fade in WebKit. Nested masks just compose. */
   .hero-profile > div {
-    @apply rounded-none border-0 shadow-none;
+    @apply rounded-none border-0 shadow-none ring-0;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
   }

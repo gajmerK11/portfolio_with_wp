@@ -37,7 +37,7 @@ function portfolio_render_sidebar_profile( $id = 'sidebar-profile' ) {
 
 	ob_start();
 	?>
-	<div <?php echo $id ? 'id="' . esc_attr( $id ) . '" ' : ''; ?>class="absolute inset-0 rounded-full overflow-hidden border-4 border-white shadow-lg">
+	<div <?php echo $id ? 'id="' . esc_attr( $id ) . '" ' : ''; ?>class="absolute inset-0 rounded-full overflow-hidden border-4 border-white shadow-lg ring-2 ring-[#004fff]/30">
 		<img
 			alt="<?php esc_attr_e( 'Profile picture', 'portfolio' ); ?>"
 			class="w-full h-full object-cover"
