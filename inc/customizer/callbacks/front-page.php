@@ -78,9 +78,9 @@ function portfolio_fp_expand_icons( $value ) {
  */
 function portfolio_fp_greeting_defaults() {
 	return array(
-		'row1'     => '<span class="text-neutral">&lt;</span> Hi, I\'m <span class="text-primary">Brice</span> ! <span class="text-neutral">&gt;</span>',
-		'row2'     => '<span class="text-neutral">&lt;</span> I <span class="text-primary">design</span> and <span class="text-primary">develop</span> <br> <span class="text-primary">web sites</span> . <span class="text-neutral">&gt;</span>',
-		'subtitle' => 'I also design your branding, logo...',
+		'row1'     => '<span class="text-neutral">&lt;</span> Hi, I\'m <span class="text-primary">Kumar</span> ! <span class="text-neutral">&gt;</span>',
+		'row2'     => '<span class="text-neutral">&lt;</span> I <span class="text-primary">code</span> and <span class="text-primary">build</span> <br> <span class="text-primary">things</span> . <span class="text-neutral">&gt;</span>',
+		'subtitle' => 'Visca el barca...',
 	);
 }
 
