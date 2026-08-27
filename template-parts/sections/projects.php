@@ -2,10 +2,10 @@
 /**
  * Projects section.
  *
- * Projects are grouped into rows of 4. Each row is its own independent
- * carousel: up to 4 cards show at once and the row's > arrow slides that row
+ * Projects are grouped into rows of 3. Each row is its own independent
+ * carousel: up to 3 cards show at once and the row's > arrow slides that row
  * (on narrower screens fewer show per view, so the arrow scrolls through the
- * row's four). Each card is one `project` CPT post (title + link + images +
+ * row's three). Each card is one `project` CPT post (title + link + images +
  * additional info), entered through the Project Details meta box.
  *
  * @package Portfolio
@@ -60,8 +60,8 @@ $portfolio_projects = new WP_Query(
 	<?php if ( $portfolio_projects->have_posts() ) : ?>
 
 		<?php
-		// Split into rows of 4; each row is its own carousel.
-		$portfolio_rows = array_chunk( $portfolio_projects->posts, 4 );
+		// Split into rows of 3; each row is its own carousel.
+		$portfolio_rows = array_chunk( $portfolio_projects->posts, 3 );
 		foreach ( $portfolio_rows as $portfolio_row ) :
 			?>
 			<div class="project-row carousel-row relative mb-4 sm:mb-8" data-carousel>
