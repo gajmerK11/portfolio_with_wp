@@ -1,6 +1,6 @@
 <?php
 /**
- * "They trusted me" testimonials section.
+ * "From people I've worked with" testimonials section.
  *
  * Sits directly under the projects section, mirroring the reference design's
  * `.secav` block: a centred heading with a star glyph, then the cards in a
@@ -40,12 +40,13 @@ if ( ! $portfolio_testimonials->have_posts() ) {
 	<?php
 	// Same heading treatment as the projects section: nowrap plus a fluid size,
 	// because at a flat 42px the phrase broke onto a second line on every phone
-	// and a heading that reflows mid-phrase reads as two headings. 8vw is the
-	// rate the longest of these headings can carry — see the section's mobile
-	// side padding above, which was cut to 1rem for the same reason.
+	// and a heading that reflows mid-phrase reads as two headings. 5vw, not the
+	// projects section's 8vw: this phrase is nearly twice as long, and at 8vw a
+	// 320px phone cannot hold it on one line — see the section's mobile side
+	// padding above, which was cut to 1rem for the same reason.
 	?>
-	<h2 class="relative z-10 text-[clamp(1.6rem,8vw,42px)] font-semibold text-dark mb-5 flex items-center gap-2 sm:gap-3 whitespace-nowrap">
-		<?php esc_html_e( 'They trusted me', 'portfolio' ); ?>
+	<h2 class="relative z-10 text-[clamp(1rem,5vw,42px)] font-semibold text-dark mb-5 flex items-center gap-2 sm:gap-3 whitespace-nowrap">
+		<?php esc_html_e( 'From people I’ve worked with', 'portfolio' ); ?>
 		<span class="text-primary">&#10022;</span>
 	</h2>
 

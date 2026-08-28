@@ -13,6 +13,18 @@
      `profile` spacing tokens (w-sidebar, ml-sidebar, left-sidebar, w-profile). */
   :root {
     --sidebar-w: clamp(20rem, calc((100vw / 12) * 2.5), 26rem);
+    /* Right edge of the About/section content column, measured from the left
+       of the viewport: the sidebar the main is offset by, the section's own
+       sm+ side padding, and the column's max-w-4xl. Capped by the viewport
+       less that padding, because below ~1300px the column is narrower than
+       its max and the cap is the real edge. The "Work with me" pill reads
+       this so it can never be parked on top of the copy. */
+    --content-right: min(
+      calc(var(--sidebar-w) + 2.5rem + 56rem),
+      calc(100vw - 2.5rem)
+    );
+    /* The pill's own width — 159.34px measured, see .work-btn h4 below. */
+    --work-w: 10rem;
     --profile-size: clamp(11rem, calc((100vw / 12) * 1.5), 15rem);
     /* The floating nav pill scales from one dial, below the nav breakpoint.
        Everything in the bar is a multiple of the icon — the button padding, the
@@ -231,11 +243,33 @@
   .work-btn {
     @apply fixed bottom-[5%] right-[5%] nav:bottom-auto nav:top-[5%] z-[60] flex items-center bg-primary hover:bg-accent-dark rounded-[10px] nav:rounded-[5px] px-4 py-1 nav:px-[25px] nav:py-[5px] overflow-hidden cursor-pointer transition-all duration-200;
   }
+  /* From the nav breakpoint up the pill is a top-right corner element while
+     the copy is a left column of bounded width, so the free gutter between
+     them is whatever the window has spare — and on a 1440px laptop that is
+     under 200px, less than a 5% inset plus the pill. The inset therefore
+     tightens toward the window edge as the gutter closes: 5% while it fits,
+     otherwise whatever leaves the pill clear of --content-right, with 1rem as
+     the floor so it never touches the edge. Wider windows are untouched — at
+     1920px and up the first term is still the smallest. */
+  @screen nav {
+    .work-btn {
+      right: max(
+        1rem,
+        min(5%, calc(100vw - var(--content-right) - var(--work-w) - 1rem))
+      );
+    }
+  }
   /* Sora, as the reference reports for this button. 24px on a 150% line box
      gives the 72px content height in its computed box (159.34 x 82 overall
      with 5px/25px padding). */
   .work-btn h4 {
     @apply font-sans text-white font-bold text-base sm:text-lg nav:text-2xl leading-[150%] m-0;
+  }
+  /* Second label line nudged down off the arrow, which crosses the button at
+     its vertical centre. Relative — no layout shift, so the arrow and the
+     button box stay where they are. */
+  .work-btn .work-line2 {
+    @apply relative inline-block top-[2px] nav:top-[4px];
   }
   /* The arrow overlays the label rather than sitting in the flex flow, so it
      spans the whole button and crosses between the two lines of text. It is
@@ -281,10 +315,31 @@
     scale: 1;
     transition: 300ms ease-in-out;
   }
-  @screen nav {
+  /* The grown state — the move to 40%, the inward drift and the 1.3 scale —
+     is one thing and is gated on the window having room for all of it. The
+     grown pill is 160 x 1.3 = 208 wide and it has two walls, not one: the
+     copy on its left, ending at --content-right, and the Download CV tab on
+     its right, a 53px fixed rail at the edge. Both only matter once the pill
+     drops to 40%: at its resting 5% it is above the tab, which is centred.
+     208 + 53 + clearance is about 270px of gutter, which the sidebar's 320px
+     floor puts at roughly 1525px of window.
+
+     Under that the pill does not move at all — it keeps its size, its top-5%
+     slot and the guarded inset above. Growing or dropping it there would put
+     it over the copy or over the tab, which is the whole reason for the gate.
+
+     The 10% drift is guarded like the resting inset, against the grown width,
+     with the tab's rail plus a little air as the floor. 10% is a big inset,
+     so the drift itself is what walks the pill into the copy: unguarded it
+     lands 66px inside the column at 1500px and only clears on its own past
+     about 1620px. Between those the min() gives back just enough. */
+  @media (min-width: 1530px) {
     .work-btn.is-grown {
       top: 40%;
-      right: 10%;
+      right: max(
+        3.9rem,
+        min(10%, calc(100vw - var(--content-right) - 13rem - 1rem))
+      );
       scale: 1.3;
     }
   }

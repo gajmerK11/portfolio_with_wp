@@ -58,7 +58,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<!-- Fixed top-right CTA — opens the slide-in contact panel -->
 	<a class="work-btn group" href="#contact" data-contact-open aria-haspopup="dialog">
-		<h4><?php esc_html_e( 'Work', 'portfolio' ); ?> <br> <?php esc_html_e( 'with me', 'portfolio' ); ?></h4>
+		<h4><?php esc_html_e( 'Get', 'portfolio' ); ?> <br> <span class="work-line2"><?php esc_html_e( 'in touch', 'portfolio' ); ?></span></h4>
 		<span class="work-arrow" aria-hidden="true">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/aright.svg' ); ?>" alt="">
 		</span>
