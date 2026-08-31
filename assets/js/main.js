@@ -577,10 +577,34 @@
     var err = form.querySelector(".cp-err");
     var succ = form.querySelector(".cp-succ");
     var button = form.querySelector('button[type="submit"]');
+    var errTimer = null;
+
+    // Errors clear themselves. Left standing, "Please fill in every field."
+    // outlives the problem: the visitor fills the fields, the panel still
+    // accuses them of not having, and the only way to clear it is a second
+    // submit. Any new message cancels the pending timer, so a fast retry does
+    // not get its error wiped by the previous one's countdown.
+    function showError(text) {
+      window.clearTimeout(errTimer);
+      err.textContent = text;
+      if (text) {
+        errTimer = window.setTimeout(function () {
+          err.textContent = "";
+        }, 6000);
+      }
+    }
+
+    // Typing is the visitor acting on the error, so drop it immediately rather
+    // than making them watch a stale complaint run out its clock.
+    form.addEventListener("input", function () {
+      if (err.textContent) {
+        showError("");
+      }
+    });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      err.textContent = "";
+      showError("");
       succ.textContent = "";
 
       var data = new FormData(form);
@@ -589,11 +613,11 @@
       var message = (data.get("message") || "").trim();
 
       if (!email || !name || !message) {
-        err.textContent = "Please fill in every field.";
+        showError("Please fill in every field.");
         return;
       }
       if (!cfg || !cfg.ajax) {
-        err.textContent = "Contact form is not configured.";
+        showError("Contact form is not configured.");
         return;
       }
 
@@ -625,13 +649,14 @@
               l.classList.remove("is-shown");
             });
           } else {
-            err.textContent =
+            showError(
               (res && res.data && res.data.message) ||
-              "Something went wrong. Please try again.";
+                "Something went wrong. Please try again."
+            );
           }
         })
         .catch(function () {
-          err.textContent = "Network error. Please try again.";
+          showError("Network error. Please try again.");
         })
         .finally(function () {
           button.disabled = false;

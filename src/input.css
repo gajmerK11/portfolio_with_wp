@@ -819,11 +819,19 @@
   .xp-role {
     @apply text-[13px] font-semibold uppercase tracking-[0.08em] text-neutral m-0;
   }
+  /* Each bullet is one unbroken line. The 62ch measure that used to cap this
+     list is gone: it was what folded a bullet onto a second line, and a
+     two-line bullet reads as two bullets when the marker only sits beside the
+     first line.
+
+     nowrap can overflow — a long bullet on a phone is wider than the column —
+     so the list scrolls sideways rather than pushing the page wide. Only this
+     list scrolls; the section itself keeps its own overflow hidden. */
   .xp-bullets {
-    @apply mt-4 mb-0 pl-0 list-none max-w-[62ch];
+    @apply mt-4 mb-0 pl-0 list-none overflow-x-auto;
   }
   .xp-bullets li {
-    @apply relative pl-5 mb-2 last:mb-0 text-base font-light leading-[1.7] text-[#333];
+    @apply relative pl-5 mb-2 last:mb-0 text-base font-light leading-[1.7] text-[#333] whitespace-nowrap;
   }
   /* Square marker rather than a disc — it echoes the 5px-radius geometry. */
   .xp-bullets li::before {
