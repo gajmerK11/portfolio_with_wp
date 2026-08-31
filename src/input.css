@@ -684,26 +684,55 @@
   .xp-date {
     @apply font-hero font-light text-[34px] leading-none text-primary m-0;
   }
-  /* Company line is a flex row so the optional logo sits on the text's
-     baseline block rather than pushing it down: the icon is a fixed
-     square, the name takes the rest and wraps on its own. */
-  .xp-company {
-    @apply inline-flex items-center gap-2.5 text-[25px] font-light text-dark mt-3 mb-1;
+  /* Company name and logo are siblings inside .xp-body (see the section
+     template), so .xp-body is what lays them out — and it lays them out two
+     different ways.
+
+     Phones: a plain flex column in document order — date, company, role,
+     logo. That is the point of the sibling markup: the logo lands under the
+     role, clear of a company name that wraps to two lines in a narrow
+     column.
+
+     sm and up: a two-column grid where the company name and the logo share
+     the first content row, so the pair reads as one line again. The name
+     column is 1fr so it takes the space it needs; the logo column is auto so
+     the mark stays at its natural width. Everything else spans both columns.
+     Explicit rows keep the order fixed regardless of which optional fields
+     an entry actually has. */
+  .xp-body {
+    @apply flex flex-col items-start;
   }
-  /* Sits after the company name. Height is set in em off the 25px company
-     line so it tracks the type; width is left to the image, so a wide
-     wordmark shows at its natural proportions instead of being squared
-     off. max-width keeps a very long mark from crowding the line.
+  .xp-company {
+    @apply text-[25px] font-light text-dark mt-3 mb-1 min-w-0;
+  }
+  .xp-company-name {
+    @apply min-w-0;
+  }
+  /* Height is set in em off the 25px company line so it tracks the type;
+     width is left to the image, so a wide wordmark shows at its natural
+     proportions instead of being squared off.
 
      No plate, no border, no padding — the logo sits straight on the page
      the way the rest of the timeline does. Desaturated at rest so a
      coloured mark doesn't outshout the navy heading, with its own colour
-     restored on hover of the whole company line (the name is the bigger
-     target, and the two read as one unit). */
+     restored on hover (the whole entry is the target now that the logo is
+     no longer inside the heading). */
   .xp-logo {
     @apply inline-flex items-center shrink-0;
     height: 1.5em;
-    max-width: 9em;
+    font-size: 25px;
+    max-width: 100%;
+  }
+  /* On its own line under the role, the logo needs the breathing room the
+     flex row used to give it as a gap. Scoped to the phone layout: a
+     :not() selector outweighs the plain .xp-logo in the sm block below, and
+     media queries add no specificity of their own, so left unscoped this
+     margin would survive into the grid and drop the logo off the company
+     line. */
+  @media (max-width: 639px) {
+    .xp-logo:not(:first-child) {
+      @apply mt-4;
+    }
   }
   .xp-logo img {
     @apply h-full w-auto max-w-full object-contain object-left;
@@ -711,7 +740,7 @@
     opacity: 0.75;
     transition: filter 300ms ease, opacity 300ms ease;
   }
-  .xp-company:hover .xp-logo img {
+  .xp-entry:hover .xp-logo img {
     filter: grayscale(0);
     opacity: 1;
   }
@@ -722,8 +751,37 @@
       opacity: 1;
     }
   }
-  .xp-company-name {
-    @apply min-w-0;
+  @media (min-width: 640px) {
+    /* Three columns, not two: the name shrink-wraps, the logo sits directly
+       after it, and a third 1fr track soaks up whatever is left. With the
+       name column as 1fr instead, it stretched to the full body width and
+       threw the logo out to the right-hand edge — the pair has to read as
+       one line. minmax(0, max-content) so a long name still wraps rather
+       than forcing the row wider than the column. */
+    .xp-body {
+      @apply grid items-start;
+      grid-template-columns: minmax(0, max-content) auto minmax(0, 1fr);
+    }
+    /* Date and role run the full width; only the company/logo pair splits. */
+    .xp-date,
+    .xp-role,
+    .xp-bullets {
+      grid-column: 1 / -1;
+    }
+    /* Row 1 is the date, row 2 the company/logo pair, and the full-width
+       items below place themselves after it in source order. */
+    .xp-company {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .xp-logo {
+      grid-column: 2;
+      grid-row: 2;
+      /* Back on the company line: cap the width so a long wordmark cannot
+         squeeze the name, and restore the row's gap and vertical centring. */
+      @apply self-center ml-2.5 mt-0;
+      max-width: 9em;
+    }
   }
   .xp-role {
     @apply text-[13px] font-semibold uppercase tracking-[0.08em] text-neutral m-0;

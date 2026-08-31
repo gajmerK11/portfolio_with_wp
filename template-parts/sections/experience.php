@@ -69,29 +69,38 @@ if ( empty( $portfolio_experience ) ) {
 						<p class="xp-date"><?php echo esc_html( $portfolio_entry['label'] ); ?></p>
 					<?php endif; ?>
 
-					<?php if ( '' !== trim( (string) $portfolio_entry['company'] ) || $xp_logo ) : ?>
+					<?php
+					// The logo is a sibling of the company heading rather than a child
+					// of it, because the two layouts want it in different places: beside
+					// the name from sm up, and on its own line *below the role* on
+					// phones. One element, moved with `order` on the flex column that
+					// .xp-body becomes — see .xp-logo in src/input.css. Duplicating the
+					// markup per breakpoint would ship the image twice.
+					?>
+					<?php if ( '' !== trim( (string) $portfolio_entry['company'] ) ) : ?>
 						<h4 class="xp-company">
 							<span class="xp-company-name"><?php echo esc_html( $portfolio_entry['company'] ); ?></span>
-							<?php if ( $xp_logo ) : ?>
-								<span class="xp-logo">
-									<?php
-									echo wp_get_attachment_image(
-										$xp_logo,
-										'medium',
-										false,
-										array(
-											'alt'     => '',
-											'loading' => 'lazy',
-										)
-									);
-									?>
-								</span>
-							<?php endif; ?>
 						</h4>
 					<?php endif; ?>
 
 					<?php if ( '' !== trim( (string) $portfolio_entry['role'] ) ) : ?>
 						<p class="xp-role"><?php echo esc_html( $portfolio_entry['role'] ); ?></p>
+					<?php endif; ?>
+
+					<?php if ( $xp_logo ) : ?>
+						<span class="xp-logo">
+							<?php
+							echo wp_get_attachment_image(
+								$xp_logo,
+								'medium',
+								false,
+								array(
+									'alt'     => '',
+									'loading' => 'lazy',
+								)
+							);
+							?>
+						</span>
 					<?php endif; ?>
 
 					<?php if ( $xp_bullets ) : ?>
