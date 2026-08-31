@@ -16,10 +16,14 @@ function portfolio_enqueue_assets() {
 	$theme_uri  = get_template_directory_uri();
 	$theme_path = get_template_directory();
 
-	// Google Fonts: Sora (body) + Fira Sans (hero greeting).
+	// Google Fonts: Sora (body) + Fira Sans (hero greeting, timeline dates and
+	// the About quote). Fira Sans is requested with its italic axis as well:
+	// the quote is set in real italics, and without the ital range the browser
+	// would slant the roman face instead, which reads as a rendering fault at
+	// 32px.
 	wp_enqueue_style(
 		'portfolio-fonts',
-		'https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;300;400&family=Sora:wght@100..800&display=swap',
+		'https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,300;0,400;1,300;1,400&family=Sora:wght@100..800&display=swap',
 		array(),
 		null
 	);

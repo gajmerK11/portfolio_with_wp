@@ -25,6 +25,10 @@ $a = array(
 	'lead2'    => get_user_meta( $portfolio_about_id, 'portfolio_about_lead2', true ),
 	'desc2'    => get_user_meta( $portfolio_about_id, 'portfolio_about_desc2', true ),
 );
+// The quote is permanent furniture, not a fallback: it opens the block whatever
+// else is filled in, so it is always fetched.
+$portfolio_quote = function_exists( 'portfolio_get_about_quote' ) ? portfolio_get_about_quote() : array();
+
 // Fall back to the user's display name when no explicit name is set.
 if ( '' === $a['name'] ) {
 	$portfolio_about_user = get_userdata( $portfolio_about_id );
@@ -85,19 +89,62 @@ if ( '' === $a['name'] ) {
 	<?php endif; ?>
 
 	<!-- Block 1 -->
-	<?php if ( $a['lead1'] ) : ?>
-		<h3 class="text-[32px] font-normal text-dark mt-10 leading-snug"><?php echo esc_html( $a['lead1'] ); ?></h3>
+	<?php
+	// The block opens on a rotating programming quote, above the owner's own
+	// lead heading. The two are not alternatives — the quote is a standing
+	// epigraph for the section and the heading is the first thing the owner
+	// says in their own voice, so both are shown.
+	//
+	// The quote takes the heading's size and colour so the two read as a pair,
+	// but is set in Fira Sans light italic rather than the body Sora: in the
+	// same face it was indistinguishable from the copy around it, and a
+	// borrowed line should not look like the owner's own words. Fira Sans is
+	// already the timeline's face, so this is a voice the page has, not a
+	// fourth font. Quote marks are drawn in ::before/::after (see .about-quote
+	// in src/input.css) so they can hang in the margin instead of indenting the
+	// first line.
+	//
+	// Nothing is shown if the service is unreachable (see inc/about-quote.php);
+	// the section simply opens on the heading instead.
+	?>
+	<?php if ( $portfolio_quote ) : ?>
+		<figure class="about-quote mt-10 m-0">
+			<blockquote class="m-0">
+				<h3 class="font-hero italic font-light text-[32px] text-dark leading-snug">
+					<?php echo esc_html( $portfolio_quote['text'] ); ?>
+				</h3>
+			</blockquote>
+			<?php if ( $portfolio_quote['author'] ) : ?>
+				<figcaption class="font-hero text-neutral text-[19px] tracking-wide mt-3">
+					&mdash; <?php echo esc_html( $portfolio_quote['author'] ); ?>
+				</figcaption>
+			<?php endif; ?>
+		</figure>
 	<?php endif; ?>
+	<?php if ( $a['lead1'] ) : ?>
+		<h3 class="text-[32px] font-normal text-dark mt-10 leading-snug"><?php echo nl2br( esc_html( $a['lead1'] ) ); ?></h3>
+	<?php endif; ?>
+	<?php
+	// Both descriptions sit mt-12 under their heading. At the original mt-4 a
+	// heading and its paragraph ran together as one dense block, with no more
+	// separation inside a block than between them.
+	?>
 	<?php if ( $a['desc1'] ) : ?>
-		<p class="text-dark text-[22px] mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc1'] ) ); ?></p>
+		<p class="text-dark text-[22px] mt-12 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc1'] ) ); ?></p>
 	<?php endif; ?>
 
 	<!-- Block 2 -->
+	<?php
+	// nl2br like the descriptions below: the profile field is a textarea, so a
+	// line break typed into it is part of the copy. Without this the two lines
+	// of a heading ran together into one long line that then wrapped wherever
+	// the column happened to end.
+	?>
 	<?php if ( $a['lead2'] ) : ?>
-		<h3 class="text-[32px] font-normal text-dark mt-10 leading-snug"><?php echo esc_html( $a['lead2'] ); ?></h3>
+		<h3 class="text-[32px] font-normal text-dark mt-10 leading-snug"><?php echo nl2br( esc_html( $a['lead2'] ) ); ?></h3>
 	<?php endif; ?>
 	<?php if ( $a['desc2'] ) : ?>
-		<p class="text-dark text-[22px] mt-4 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc2'] ) ); ?></p>
+		<p class="text-dark text-[22px] mt-12 leading-relaxed max-w-2xl"><?php echo nl2br( esc_html( $a['desc2'] ) ); ?></p>
 	<?php endif; ?>
 
 	</div>

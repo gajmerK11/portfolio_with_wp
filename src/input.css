@@ -642,6 +642,39 @@
     content: "\201D";
   }
 
+  /* About — the quote that stands in for an empty lead heading.
+
+     The marks are generated rather than typed into the markup so they can be
+     pulled into the left margin: a literal opening quote in the text pushes
+     the first line in by its own width, and the ragged left edge that makes
+     is the thing that reads as broken alignment against the name and the
+     paragraphs above. Negative margin on ::before hangs it outside the
+     measure and lets the text start flush.
+
+     They are sized off the quote's own font-size and tinted with the navy the
+     section uses for accents, so they carry the punctuation without competing
+     with the words. */
+  .about-quote blockquote h3::before {
+    content: "“";
+    margin-left: -0.42em;
+    color: theme("colors.primary");
+    opacity: 0.55;
+  }
+  .about-quote blockquote h3::after {
+    content: "”";
+    color: theme("colors.primary");
+    opacity: 0.55;
+  }
+  /* The copy that follows needs more air after a quote than one block of the
+     owner's own writing needs after another: the quote is a borrowed aside,
+     and without the extra break it reads as though the attribution and the
+     greeting belong to the same thought. Keyed off the sibling rather than a
+     class on the copy, so that element keeps the same markup as the matching
+     heading further down the section. */
+  .about-quote + h3 {
+    @apply mt-16;
+  }
+
   /* Experience timeline. A 1px navy rail with a node per entry; the newest
      entry's node is filled pink with a halo. No cards — the hover state is a
      faint tint and a hairline, in keeping with the rest of the page. */
