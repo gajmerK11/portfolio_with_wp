@@ -64,37 +64,19 @@ $wp_customize->add_control( 'portfolio_fp_subtitle', array(
 ) );
 
 /* -----------------------------------------------------------------------
- * Download CV file (the vertical tab on the right edge links to it).
+ * The CV upload and the eight floating-icon pickers used to live here.
+ *
+ * The CV moved to the owner's user profile (inc/user-profile-cv.php), which is
+ * where the rest of the owner's own material already is; portfolio_cv_url()
+ * still falls back to the old theme mod, so a CV uploaded here before the move
+ * keeps working. The floating hero icons are a fixed set of technology marks —
+ * they are decoration, not content, and eight image pickers for them buried
+ * the three fields on this screen anyone actually edits.
+ *
+ * Neither setting is registered any more, so neither can be changed from the
+ * Customizer. Any values already saved are still read (see the callbacks in
+ * inc/customizer/callbacks/front-page.php) and are not deleted.
  * -------------------------------------------------------------------- */
-$wp_customize->add_setting( 'portfolio_cv_url', array(
-	'default'           => '',
-	'sanitize_callback' => 'esc_url_raw',
-	'transport'         => 'postMessage',
-) );
-$wp_customize->add_control( new WP_Customize_Upload_Control( $wp_customize, 'portfolio_cv_url', array(
-	'label'       => __( 'CV file', 'portfolio' ),
-	'description' => __( 'Upload the CV (PDF) that the "Download CV" tab links to.', 'portfolio' ),
-	'section'     => 'portfolio_front_page',
-) ) );
-
-/* -----------------------------------------------------------------------
- * Floating tech icons (8 image controls). Empty = built-in default.
- * -------------------------------------------------------------------- */
-$portfolio_icon_defaults = portfolio_fp_icon_defaults();
-foreach ( $portfolio_icon_defaults as $i => $icon ) {
-	$id = 'portfolio_fp_icon_' . $i;
-	$wp_customize->add_setting( $id, array(
-		'default'           => '',
-		'sanitize_callback' => 'esc_url_raw',
-		'transport'         => 'postMessage',
-	) );
-	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, $id, array(
-		/* translators: %d: icon number. */
-		'label'       => sprintf( __( 'Icon %d', 'portfolio' ), $i ),
-		'description' => __( 'Leave empty to use the default icon.', 'portfolio' ),
-		'section'     => 'portfolio_front_page',
-	) ) );
-}
 
 /* -----------------------------------------------------------------------
  * Selective refresh partials (give each element the pencil edit shortcut).
@@ -114,22 +96,4 @@ if ( isset( $wp_customize->selective_refresh ) ) {
 		'render_callback'     => 'portfolio_render_fp_subtitle',
 	) );
 
-	$wp_customize->selective_refresh->add_partial( 'portfolio_cv_partial', array(
-		'selector'            => '#download-cv',
-		'container_inclusive' => true,
-		'settings'            => array( 'portfolio_cv_url' ),
-		'render_callback'     => 'portfolio_render_download_cv',
-	) );
-
-	$wp_customize->selective_refresh->add_partial( 'portfolio_fp_icons_partial', array(
-		'selector'            => '#fp-floating-icons',
-		'container_inclusive' => true,
-		'settings'            => array_map(
-			function ( $i ) {
-				return 'portfolio_fp_icon_' . $i;
-			},
-			array_keys( $portfolio_icon_defaults )
-		),
-		'render_callback'     => 'portfolio_render_fp_icons',
-	) );
 }
