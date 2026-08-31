@@ -57,7 +57,26 @@ add_filter(
 	'manage_skill_posts_columns',
 	function ( $columns ) {
 		$columns['title'] = __( 'Category', 'portfolio' );
-		return $columns;
+
+		// Drag handle goes first, ahead of the checkbox, so the grab target is
+		// the leading edge of the row the way it is on the Experience screen.
+		// Without a visible handle the list looks like an ordinary post list
+		// and nothing suggests the rows can be moved at all.
+		return array( 'portfolio_order' => '<span class="screen-reader-text">' . esc_html__( 'Reorder', 'portfolio' ) . '</span>' ) + $columns;
+	}
+);
+
+/**
+ * Render the drag handle cell.
+ *
+ * @param string $column  Column key.
+ */
+add_action(
+	'manage_skill_posts_custom_column',
+	function ( $column ) {
+		if ( 'portfolio_order' === $column ) {
+			echo '<span class="portfolio-skill-handle dashicons dashicons-menu" aria-hidden="true"></span>';
+		}
 	}
 );
 
@@ -72,10 +91,18 @@ function portfolio_skills_admin_order( $query ) {
 		return;
 	}
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-	if ( $screen && 'edit-skill' === $screen->id ) {
-		$query->set( 'orderby', 'menu_order' );
-		$query->set( 'order', 'ASC' );
+	if ( ! $screen || 'edit-skill' !== $screen->id ) {
+		return;
 	}
+	// Only the default view. Clicking a sortable column header sets orderby in
+	// the URL, and forcing menu_order over it would make those headers dead.
+	// The drag handle is hidden in that state (see the list script) because a
+	// drop would write an order the visible list is not showing.
+	if ( isset( $_GET['orderby'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only list-table state.
+		return;
+	}
+	$query->set( 'orderby', 'menu_order' );
+	$query->set( 'order', 'ASC' );
 }
 add_action( 'pre_get_posts', 'portfolio_skills_admin_order' );
 
@@ -94,17 +121,47 @@ function portfolio_skills_list_assets( $hook ) {
 	}
 
 	wp_enqueue_script( 'jquery-ui-sortable' );
+	wp_enqueue_style( 'dashicons' );
+
+	// The list table has no styling for a handle column, and the sort needs to
+	// look like it did something — the AJAX write is otherwise invisible.
+	$css = <<<'CSS'
+	.wp-list-table .column-portfolio_order { width: 32px; text-align: center; }
+	.wp-list-table .portfolio-skill-handle { cursor: grab; color: #a7aaad; }
+	.wp-list-table .portfolio-skill-handle:active { cursor: grabbing; }
+	.wp-list-table tr:hover .portfolio-skill-handle { color: #2271b1; }
+	.wp-list-table tr.portfolio-skill-sorting { opacity: .7; }
+	.wp-list-table tr.portfolio-skill-placeholder > td,
+	.wp-list-table tr.portfolio-skill-placeholder > th { background: #f0f6fc; height: 46px; }
+	.wp-list-table tr.portfolio-skill-saved > td,
+	.wp-list-table tr.portfolio-skill-saved > th { animation: portfolio-skill-flash 1s ease; }
+	@keyframes portfolio-skill-flash { from { background: #f0f6fc; } to { background: transparent; } }
+CSS;
+	wp_add_inline_style( 'dashicons', $css );
 
 	$inline = <<<'JS'
 	jQuery( function ( $ ) {
 		var list = $( '#the-list' );
 		if ( ! list.length ) { return; }
 
+		// Dragging only means anything while the list is in menu_order, which
+		// is the unsorted default. Under a column sort the rows are in some
+		// other order, so a drop would save positions that do not match what
+		// is on screen — drop the handles instead.
+		if ( /[?&]orderby=/.test( window.location.search ) ) {
+			$( '.portfolio-skill-handle' ).remove();
+			return;
+		}
+
 		list.sortable( {
 			items: 'tr',
+			// Restricted to the handle so the row's own controls — the
+			// checkbox, the title link, the row actions — stay clickable
+			// instead of starting a drag.
+			handle: '.portfolio-skill-handle',
 			axis: 'y',
-			cursor: 'move',
-			opacity: 0.7,
+			cursor: 'grabbing',
+			placeholder: 'portfolio-skill-placeholder',
 			helper: function ( e, tr ) {
 				// Lock cell widths so the dragged row keeps its column layout.
 				var helper = tr.clone();
@@ -113,7 +170,16 @@ function portfolio_skills_list_assets( $hook ) {
 				} );
 				return helper;
 			},
-			update: function () {
+			start: function ( e, ui ) {
+				ui.item.addClass( 'portfolio-skill-sorting' );
+				// The placeholder is a bare <tr>; give it cells or it collapses
+				// to nothing and the list jumps while dragging.
+				ui.placeholder.html( '<td colspan="' + ui.item.children().length + '"></td>' );
+			},
+			stop: function ( e, ui ) {
+				ui.item.removeClass( 'portfolio-skill-sorting' );
+			},
+			update: function ( e, ui ) {
 				var ids = list.find( 'tr' ).map( function () {
 					return this.id ? this.id.replace( 'post-', '' ) : null;
 				} ).get();
@@ -122,9 +188,24 @@ function portfolio_skills_list_assets( $hook ) {
 					action: 'portfolio_reorder_skills',
 					nonce: PortfolioSkillsReorder.nonce,
 					order: ids
+				} ).done( function () {
+					ui.item.removeClass( 'portfolio-skill-saved' );
+					// Reflow so the animation restarts on a repeated drop.
+					void ui.item[ 0 ].offsetWidth;
+					ui.item.addClass( 'portfolio-skill-saved' );
+				} ).fail( function () {
+					window.alert( PortfolioSkillsReorder.error );
 				} );
 			}
 		} ).disableSelection();
+
+		// Zebra striping is baked into the markup, so it goes wrong the moment
+		// a row moves. Recolour from position after every drop.
+		list.on( 'sortupdate', function () {
+			list.find( 'tr' ).each( function ( i ) {
+				$( this ).toggleClass( 'alternate', 0 === i % 2 );
+			} );
+		} );
 	} );
 JS;
 
@@ -132,7 +213,10 @@ JS;
 	wp_localize_script(
 		'jquery-ui-sortable',
 		'PortfolioSkillsReorder',
-		array( 'nonce' => wp_create_nonce( 'portfolio_reorder_skills' ) )
+		array(
+			'nonce' => wp_create_nonce( 'portfolio_reorder_skills' ),
+			'error' => __( 'The new order could not be saved. Reload the page and try again.', 'portfolio' ),
+		)
 	);
 }
 add_action( 'admin_enqueue_scripts', 'portfolio_skills_list_assets' );
