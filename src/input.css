@@ -571,23 +571,23 @@
      wrapped row does not, and it already re-runs that on resize. So the arrows
      hide themselves and the loop clones are dropped on their own. */
   .reviews {
-    @apply relative z-10 flex flex-col items-center gap-5 py-8;
+    @apply relative z-10 flex flex-col items-center gap-4 py-8;
   }
   @screen sm {
     .reviews {
-      @apply flex-row flex-wrap justify-center;
+      @apply flex-row flex-wrap justify-center items-start;
     }
   }
   @screen nav {
     .reviews {
-      @apply flex-nowrap justify-start overflow-x-auto snap-x scroll-smooth;
+      @apply flex-nowrap justify-start items-start overflow-x-auto snap-x scroll-smooth;
     }
   }
   /* Full width up to the reference's 300px, not a flat 300px: on a 320px phone
      a fixed card is wider than the column it sits in, and the stack has no
      scroller left to reach the overhang with. */
   .review-card {
-    @apply relative shrink-0 snap-start rounded-[10px] p-5 w-full max-w-[300px] text-center;
+    @apply relative shrink-0 snap-start rounded-[10px] p-4 w-full max-w-[300px] text-center;
   }
   @screen sm {
     .review-card {
@@ -602,19 +602,44 @@
     background-color: white;
   }
   .review-card .client-info {
-    @apply relative z-10 flex flex-col items-center mb-4;
+    @apply relative z-10 flex flex-col items-center mb-3;
+  }
+  /* Name and the LinkedIn link share one row, centred as a unit so the
+     pair still reads as centred in the card even though the icon only
+     hangs off one side. The h4 keeps its own vertical margins. */
+  .review-card .client-name-row {
+    @apply flex items-center justify-center gap-1.5;
   }
   .review-card .client-info h4 {
-    @apply text-[1.2em] font-semibold text-dark my-1;
+    @apply text-[0.95rem] font-semibold text-dark m-0;
   }
   .review-card .client-info p {
-    @apply text-[1.05em] text-[#777] m-1;
+    @apply text-[0.85rem] text-[#777] mt-0.5 mb-0 mx-0;
   }
   .review-card .client-linkedin {
-    @apply mt-1 text-[#777] transition-colors hover:text-[#0A66C2];
+    @apply inline-flex shrink-0 text-[#777] transition-colors hover:text-[#0A66C2];
+  }
+  .review-card .client-linkedin svg {
+    @apply w-4 h-4;
   }
   .review-card .client-review {
-    @apply relative z-10 text-[#333] font-medium leading-relaxed mb-4;
+    @apply relative z-10 text-[0.9rem] text-[#333] font-normal leading-[1.55] mb-0 text-center;
+    text-wrap: balance;
+  }
+  /* Each paragraph of a multi-paragraph quote is its own block, so its
+     last line stays short instead of being stretched. Curly quotes are
+     hung on the first and last paragraph rather than every one. */
+  .review-card .client-review p {
+    @apply m-0;
+  }
+  .review-card .client-review p + p {
+    @apply mt-2;
+  }
+  .review-card .client-review p:first-of-type::before {
+    content: "\201C";
+  }
+  .review-card .client-review p:last-of-type::after {
+    content: "\201D";
   }
 
   /* Experience timeline. A 1px navy rail with a node per entry; the newest
@@ -659,8 +684,46 @@
   .xp-date {
     @apply font-hero font-light text-[34px] leading-none text-primary m-0;
   }
+  /* Company line is a flex row so the optional logo sits on the text's
+     baseline block rather than pushing it down: the icon is a fixed
+     square, the name takes the rest and wraps on its own. */
   .xp-company {
-    @apply text-[25px] font-light text-dark mt-3 mb-1;
+    @apply inline-flex items-center gap-2.5 text-[25px] font-light text-dark mt-3 mb-1;
+  }
+  /* Sits after the company name. Height is set in em off the 25px company
+     line so it tracks the type; width is left to the image, so a wide
+     wordmark shows at its natural proportions instead of being squared
+     off. max-width keeps a very long mark from crowding the line.
+
+     No plate, no border, no padding — the logo sits straight on the page
+     the way the rest of the timeline does. Desaturated at rest so a
+     coloured mark doesn't outshout the navy heading, with its own colour
+     restored on hover of the whole company line (the name is the bigger
+     target, and the two read as one unit). */
+  .xp-logo {
+    @apply inline-flex items-center shrink-0;
+    height: 1.5em;
+    max-width: 9em;
+  }
+  .xp-logo img {
+    @apply h-full w-auto max-w-full object-contain object-left;
+    filter: grayscale(1);
+    opacity: 0.75;
+    transition: filter 300ms ease, opacity 300ms ease;
+  }
+  .xp-company:hover .xp-logo img {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+  /* Touch and reduced-motion users never get the hover, so show colour. */
+  @media (hover: none) {
+    .xp-logo img {
+      filter: grayscale(0);
+      opacity: 1;
+    }
+  }
+  .xp-company-name {
+    @apply min-w-0;
   }
   .xp-role {
     @apply text-[13px] font-semibold uppercase tracking-[0.08em] text-neutral m-0;
@@ -696,56 +759,85 @@
      next row only when the remaining width is under the 280px minimum, so a
      wide window packs four or five categories into one row instead of being
      held to three by a fixed measure. The minimum is the width the longest
-     skill label ("RESTful APIs & GraphQL") needs beside its icon. */
+     skill label ("Website Development") needs beside its icon. */
   .skills-grid {
-    @apply grid gap-6;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    @apply grid gap-x-10 gap-y-12;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
-  /* Flat card, but it lifts on hover: a soft navy-tinted shadow and a navy
-     border pick it out without any loud colour — same restraint as the rest
-     of the page. */
-  .skill-card {
-    @apply bg-white rounded-[5px] border border-[#ececec] p-7 transition duration-200;
+  /* No card: each category is an open column, set off by whitespace and a
+     rule rather than a box. That matches how the rest of the page handles
+     grouped content — the experience timeline and the testimonial list are
+     both unboxed — and it lets the skill logos carry the colour instead of
+     competing with a container behind them. */
+  .skill-col {
+    @apply relative;
   }
-  .skill-card:hover {
-    @apply -translate-y-1 border-primary/25;
-    box-shadow: 0 18px 40px -20px rgba(2, 0, 115, 0.28);
-  }
-  /* Header sits over a hairline rule, so the title reads as a label for the
-     list beneath it rather than floating. */
+  /* Header rule spans the column and fades out to the right, so the eye is
+     led down into the list rather than along a closed line. */
   .skill-head {
-    @apply flex items-center gap-3 mb-4 pb-4 border-b border-[#f0f0f2];
+    @apply relative flex items-center gap-3 mb-5 pb-3;
   }
-  /* Rounded-square category chip: pale navy tint, logo contained inside. */
+  .skill-head::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(2, 0, 115, 0.28),
+      rgba(2, 0, 115, 0.06),
+      transparent
+    );
+  }
+  /* The category logo, bare. No plate behind it now that there is no card
+     for it to sit on. */
   .skill-chip {
-    @apply flex items-center justify-center shrink-0 w-11 h-11 rounded-lg overflow-hidden;
-    background: #eef1ff;
+    @apply flex items-center justify-center shrink-0 w-8 h-8 overflow-hidden;
   }
   .skill-chip img {
-    @apply w-[26px] h-[26px] object-contain;
+    @apply w-full h-full object-contain;
   }
   .skill-cat-title {
-    @apply font-hero text-[22px] font-semibold text-dark m-0;
+    @apply font-hero text-[15px] font-semibold uppercase tracking-[0.14em] text-primary m-0;
   }
   .skill-list {
-    @apply flex flex-col gap-2.5 m-0 p-0 list-none;
+    @apply flex flex-col gap-3 m-0 p-0 list-none;
   }
+  /* Rows are their own hover target now that there is no card wrapping
+     them: the name shifts a couple of pixels and its icon takes colour. */
   .skill-row {
     @apply flex items-center gap-3;
   }
-  /* Bare skill icon — no chip/circle behind it, just the logo. Greyed out at
-     rest (as the testimonial LinkedIn icon), full colour on hover. */
   .skill-ico {
-    @apply flex items-center justify-center shrink-0 w-9 h-9;
+    @apply flex items-center justify-center shrink-0 w-7 h-7;
   }
   .skill-ico img {
-    @apply w-9 h-9 object-contain grayscale opacity-70 transition duration-200;
+    @apply w-7 h-7 object-contain grayscale opacity-60;
+    transition:
+      filter 250ms ease,
+      opacity 250ms ease;
   }
   .skill-row:hover .skill-ico img {
     @apply grayscale-0 opacity-100;
   }
   .skill-name {
-    @apply text-[18px] font-normal text-dark;
+    @apply text-[17px] font-light text-dark;
+    transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .skill-row:hover .skill-name {
+    transform: translateX(3px);
+  }
+  /* The only motion left is the row hover, and it is decorative. */
+  @media (prefers-reduced-motion: reduce) {
+    .skill-ico img,
+    .skill-name {
+      transition: none;
+    }
+    .skill-row:hover .skill-name {
+      transform: none;
+    }
   }
 
   /* ---------------------------------------------------------------

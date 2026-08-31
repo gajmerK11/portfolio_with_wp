@@ -59,6 +59,7 @@ if ( ! $portfolio_skills->have_posts() ) {
 
 	<div class="skills-grid relative z-10">
 		<?php
+		$portfolio_sk_index = 0;
 		while ( $portfolio_skills->have_posts() ) :
 			$portfolio_skills->the_post();
 
@@ -68,8 +69,9 @@ if ( ! $portfolio_skills->have_posts() ) {
 			if ( ! is_array( $sk_items ) ) {
 				$sk_items = array();
 			}
+			++$portfolio_sk_index;
 			?>
-			<article class="skill-card">
+			<div class="skill-col" style="--i:<?php echo (int) $portfolio_sk_index; ?>">
 
 				<!-- Header: chip icon + category name -->
 				<div class="skill-head">
@@ -94,15 +96,17 @@ if ( ! $portfolio_skills->have_posts() ) {
 				<!-- Skills -->
 				<?php if ( $sk_items ) : ?>
 					<ul class="skill-list">
+						<?php $sk_row_index = 0; ?>
 						<?php foreach ( $sk_items as $sk_item ) : ?>
 							<?php
 							$item_icon = isset( $sk_item['icon'] ) ? (int) $sk_item['icon'] : 0;
 							$item_name = isset( $sk_item['name'] ) ? $sk_item['name'] : '';
+							++$sk_row_index;
 							if ( '' === trim( (string) $item_name ) && ! $item_icon ) {
 								continue;
 							}
 							?>
-							<li class="skill-row">
+							<li class="skill-row" style="--r:<?php echo (int) $sk_row_index; ?>">
 								<span class="skill-ico">
 									<?php
 									if ( $item_icon ) {
@@ -124,7 +128,7 @@ if ( ! $portfolio_skills->have_posts() ) {
 					</ul>
 				<?php endif; ?>
 
-			</article>
+			</div>
 		<?php endwhile; ?>
 	</div>
 </section>

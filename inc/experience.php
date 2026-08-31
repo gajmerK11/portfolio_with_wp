@@ -11,9 +11,13 @@
  * Shape of the option:
  *   [
  *     [ 'label' => '2021 — Present', 'company' => 'Nakshatra Technohub',
- *       'role'  => 'Senior Backend Developer', 'bullets' => "line\nline" ],
+ *       'logo'  => 42, 'role' => 'Senior Backend Developer',
+ *       'bullets' => "line\nline" ],
  *     …
  *   ]
+ *
+ * 'logo' is an attachment ID for the company icon, picked with the same
+ * wp.media frame the Skill meta box uses; 0 when none is set.
  *
  * @package Portfolio
  */
@@ -69,6 +73,7 @@ function portfolio_experience_admin_assets( $hook ) {
 		return;
 	}
 	wp_enqueue_script( 'jquery-ui-sortable' );
+	wp_enqueue_media();
 }
 add_action( 'admin_enqueue_scripts', 'portfolio_experience_admin_assets' );
 
@@ -88,10 +93,14 @@ function portfolio_experience_row( $index, $row = array(), $open = false ) {
 		array(
 			'label'   => '',
 			'company' => '',
+			'logo'    => 0,
 			'role'    => '',
 			'bullets' => '',
 		)
 	);
+
+	$logo       = (int) $row['logo'];
+	$logo_thumb = $logo ? wp_get_attachment_image_url( $logo, 'medium' ) : '';
 
 	$name = PORTFOLIO_EXPERIENCE_OPTION . '[' . $index . ']';
 	?>
@@ -99,6 +108,7 @@ function portfolio_experience_row( $index, $row = array(), $open = false ) {
 		<div class="pf-exp-head">
 			<span class="pf-exp-handle dashicons dashicons-menu" aria-hidden="true"></span>
 			<span class="pf-exp-title">
+				<img class="pf-exp-title-logo" alt=""<?php echo $logo_thumb ? ' src="' . esc_url( $logo_thumb ) . '"' : ''; ?>>
 				<span class="pf-exp-title-label"><?php echo esc_html( $row['label'] ); ?></span>
 				<span class="pf-exp-title-sep"><?php echo $row['label'] && $row['company'] ? '&middot;' : ''; ?></span>
 				<span class="pf-exp-title-company"><?php echo esc_html( $row['company'] ); ?></span>
@@ -119,6 +129,21 @@ function portfolio_experience_row( $index, $row = array(), $open = false ) {
 				<label><?php esc_html_e( 'Company', 'portfolio' ); ?></label>
 				<input type="text" name="<?php echo esc_attr( $name ); ?>[company]" value="<?php echo esc_attr( $row['company'] ); ?>"
 					placeholder="<?php esc_attr_e( 'Nakshatra Technohub', 'portfolio' ); ?>" data-title-part="company">
+			</p>
+			<p class="pf-exp-field">
+				<label><?php esc_html_e( 'Company icon', 'portfolio' ); ?></label>
+				<input type="hidden" class="pf-exp-logo-input" name="<?php echo esc_attr( $name ); ?>[logo]" value="<?php echo esc_attr( $logo ? $logo : '' ); ?>">
+				<span class="pf-exp-logo">
+					<button type="button" class="pf-exp-logo-btn">
+						<?php if ( $logo_thumb ) : ?>
+							<img src="<?php echo esc_url( $logo_thumb ); ?>" alt="">
+						<?php else : ?>
+							<span class="dashicons dashicons-plus" aria-hidden="true"></span>
+						<?php endif; ?>
+					</button>
+					<button type="button" class="button-link delete pf-exp-logo-clear"<?php echo $logo ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove icon', 'portfolio' ); ?></button>
+				</span>
+				<span class="description"><?php esc_html_e( 'Shown beside the company name. Square logos work best.', 'portfolio' ); ?></span>
 			</p>
 			<p class="pf-exp-field">
 				<label><?php esc_html_e( 'Role', 'portfolio' ); ?></label>
@@ -205,6 +230,19 @@ function portfolio_experience_screen() {
 	.pf-exp-field > label { display: block; font-weight: 600; margin-bottom: 4px; }
 	.pf-exp-field input[type=text], .pf-exp-field textarea { width: 100%; }
 	.pf-exp-actions { margin: 12px 0 0; text-align: right; }
+	/* Company icon picker — same 56px dashed square as the Skill meta box. */
+	.pf-exp-logo { display: flex; align-items: center; gap: 10px; }
+	.pf-exp-logo-btn {
+		min-width: 56px; max-width: 180px; height: 56px; border: 1px dashed #c3c4c7; border-radius: 10px;
+		background: #f6f7f7; cursor: pointer; padding: 0 6px; display: grid; place-items: center;
+		overflow: hidden; flex: 0 0 auto;
+	}
+	.pf-exp-logo-btn img { width: auto; max-width: 100%; height: 100%; object-fit: contain; }
+	.pf-exp-logo-btn .dashicons { color: #787c82; }
+	.pf-exp-logo-clear[hidden] { display: none; }
+	/* Thumbnail in the collapsed header, so a row is identifiable shut. */
+	.pf-exp-title-logo { display: none; width: auto; max-width: 64px; height: 20px; object-fit: contain; vertical-align: -5px; margin-right: 6px; }
+	.pf-exp-title-logo[src] { display: inline-block; }
 	</style>
 
 	<script>
@@ -235,6 +273,40 @@ function portfolio_experience_screen() {
 
 		rows.on( 'click', '.pf-exp-remove', function () {
 			$( this ).closest( '.pf-exp-row' ).remove();
+		} );
+
+		// Company icon. wp.media is footer-loaded, so it is only touched
+		// inside the handler. The picked attachment ID goes in the hidden
+		// input; the button and the collapsed header both show the thumb.
+		rows.on( 'click', '.pf-exp-logo-btn', function ( e ) {
+			e.preventDefault();
+			if ( typeof wp === 'undefined' || ! wp.media ) { return; }
+			var btn = $( this );
+			var row = btn.closest( '.pf-exp-row' );
+			var frame = wp.media( {
+				title: '<?php echo esc_js( __( 'Select company icon', 'portfolio' ) ); ?>',
+				button: { text: '<?php echo esc_js( __( 'Use this icon', 'portfolio' ) ); ?>' },
+				library: { type: 'image' },
+				multiple: false
+			} );
+			frame.on( 'select', function () {
+				var att = frame.state().get( 'selection' ).first().toJSON();
+				var url = ( att.sizes && att.sizes.medium ) ? att.sizes.medium.url : att.url;
+				row.find( '.pf-exp-logo-input' ).val( String( att.id ) );
+				btn.html( $( '<img alt="">' ).attr( 'src', url ) );
+				row.find( '.pf-exp-title-logo' ).attr( 'src', url );
+				row.find( '.pf-exp-logo-clear' ).prop( 'hidden', false );
+			} );
+			frame.open();
+		} );
+
+		rows.on( 'click', '.pf-exp-logo-clear', function ( e ) {
+			e.preventDefault();
+			var row = $( this ).closest( '.pf-exp-row' );
+			row.find( '.pf-exp-logo-input' ).val( '' );
+			row.find( '.pf-exp-logo-btn' ).html( '<span class="dashicons dashicons-plus" aria-hidden="true"></span>' );
+			row.find( '.pf-exp-title-logo' ).removeAttr( 'src' );
+			$( this ).prop( 'hidden', true );
 		} );
 
 		// Keep the collapsed header in step with what is being typed.
@@ -273,11 +345,13 @@ function portfolio_save_experience() {
 			$entry = array(
 				'label'   => isset( $row['label'] ) ? sanitize_text_field( $row['label'] ) : '',
 				'company' => isset( $row['company'] ) ? sanitize_text_field( $row['company'] ) : '',
+				'logo'    => isset( $row['logo'] ) ? absint( $row['logo'] ) : 0,
 				'role'    => isset( $row['role'] ) ? sanitize_text_field( $row['role'] ) : '',
 				'bullets' => isset( $row['bullets'] ) ? sanitize_textarea_field( $row['bullets'] ) : '',
 			);
 			// An entry with nothing in it is a leftover blank row.
-			if ( '' === $entry['label'] && '' === $entry['company'] && '' === $entry['role'] && '' === trim( $entry['bullets'] ) ) {
+			if ( '' === $entry['label'] && '' === $entry['company'] && 0 === $entry['logo']
+				&& '' === $entry['role'] && '' === trim( $entry['bullets'] ) ) {
 				continue;
 			}
 			$clean[] = $entry;

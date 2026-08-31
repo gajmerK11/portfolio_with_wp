@@ -58,6 +58,7 @@ if ( empty( $portfolio_experience ) ) {
 			<?php
 			$xp_bullets = portfolio_experience_bullets( $portfolio_entry['bullets'] );
 			$xp_current = ( 0 === $portfolio_i );
+			$xp_logo    = isset( $portfolio_entry['logo'] ) ? (int) $portfolio_entry['logo'] : 0;
 			?>
 			<li class="xp-entry<?php echo $xp_current ? ' is-current' : ''; ?>">
 
@@ -68,8 +69,25 @@ if ( empty( $portfolio_experience ) ) {
 						<p class="xp-date"><?php echo esc_html( $portfolio_entry['label'] ); ?></p>
 					<?php endif; ?>
 
-					<?php if ( '' !== trim( (string) $portfolio_entry['company'] ) ) : ?>
-						<h4 class="xp-company"><?php echo esc_html( $portfolio_entry['company'] ); ?></h4>
+					<?php if ( '' !== trim( (string) $portfolio_entry['company'] ) || $xp_logo ) : ?>
+						<h4 class="xp-company">
+							<span class="xp-company-name"><?php echo esc_html( $portfolio_entry['company'] ); ?></span>
+							<?php if ( $xp_logo ) : ?>
+								<span class="xp-logo">
+									<?php
+									echo wp_get_attachment_image(
+										$xp_logo,
+										'medium',
+										false,
+										array(
+											'alt'     => '',
+											'loading' => 'lazy',
+										)
+									);
+									?>
+								</span>
+							<?php endif; ?>
+						</h4>
 					<?php endif; ?>
 
 					<?php if ( '' !== trim( (string) $portfolio_entry['role'] ) ) : ?>
